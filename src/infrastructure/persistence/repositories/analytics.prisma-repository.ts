@@ -407,4 +407,24 @@ export class AnalyticsPrismaRepository implements AnalyticsRepository {
 
     return [...byDate.values()].sort((a, b) => a.date.localeCompare(b.date));
   }
+
+  async listBodyWeightKg(
+    userId: string,
+    from: Date,
+    to: Date,
+  ): Promise<Array<{ recordedAt: Date; weightKg: number }>> {
+    const rows = await this.prisma.bodyWeightEntry.findMany({
+      where: {
+        userId,
+        deletedAt: null,
+        recordedAt: { gte: from, lte: to },
+      },
+      orderBy: { recordedAt: 'asc' },
+      select: { recordedAt: true, weightKg: true },
+    });
+    return rows.map((row) => ({
+      recordedAt: row.recordedAt,
+      weightKg: Number(row.weightKg),
+    }));
+  }
 }

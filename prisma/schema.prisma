@@ -110,6 +110,7 @@ model User {
   analyticsWeekly         AnalyticsWeeklySnapshot[]
   muscleVolumeDaily       MuscleVolumeDaily[]
   exerciseStats           ExerciseStat[]
+  bodyWeightEntries       BodyWeightEntry[]
 
   @@map("users")
 }
@@ -501,4 +502,24 @@ model ExerciseStat {
 
   @@unique([userId, exerciseId])
   @@map("exercise_stats")
+}
+
+// ─── Body Metrics ────────────────────────────────────────
+
+model BodyWeightEntry {
+  id         String     @id @default(uuid()) @db.Uuid
+  userId     String     @map("user_id") @db.Uuid
+  weight     Decimal    @db.Decimal(8, 2)
+  unit       WeightUnit @default(KG)
+  weightKg   Decimal    @map("weight_kg") @db.Decimal(8, 2)
+  recordedAt DateTime   @map("recorded_at") @db.Timestamptz(6)
+  notes      String?
+  createdAt  DateTime   @default(now()) @map("created_at") @db.Timestamptz(6)
+  deletedAt  DateTime?  @map("deleted_at") @db.Timestamptz(6)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, recordedAt(sort: Desc)])
+  @@index([userId, deletedAt])
+  @@map("body_weight_entries")
 }

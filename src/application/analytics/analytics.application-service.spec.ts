@@ -17,6 +17,7 @@ describe('AnalyticsApplicationService', () => {
     countCompletedWorkouts: jest.fn(),
     countSessionsForExercise: jest.fn(),
     exerciseVolumeSeries: jest.fn(),
+    listBodyWeightKg: jest.fn(),
   };
 
   const redis = {

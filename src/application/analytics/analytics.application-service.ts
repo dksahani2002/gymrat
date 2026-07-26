@@ -478,12 +478,24 @@ export class AnalyticsApplicationService {
           points: series.points,
         };
       }
-      case 'body_weight_over_time':
+      case 'body_weight_over_time': {
+        const fromUtc = parseDateKey(input.from);
+        const toUtc = new Date(parseDateKey(input.to).getTime() + 86_400_000 - 1);
+        const rows = await this.analytics.listBodyWeightKg(
+          input.userId,
+          fromUtc,
+          toUtc,
+        );
         return {
           chartType: input.chartType,
           unit: 'kg',
-          points: [],
+          points: rows.map((row) => ({
+            x: row.recordedAt.toISOString(),
+            y: row.weightKg,
+            label: row.recordedAt.toISOString().slice(0, 10),
+          })),
         };
+      }
       default:
         throw new BusinessError(
           `Unsupported chart type: ${input.chartType as string}`,

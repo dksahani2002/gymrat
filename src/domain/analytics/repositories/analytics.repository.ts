@@ -152,5 +152,10 @@ export interface AnalyticsRepository {
     toUtc: Date,
     timeZone: string,
   ): Promise<ExerciseSeriesPoint[]>;
+  listBodyWeightKg(
+    userId: string,
+    from: Date,
+    to: Date,
+  ): Promise<Array<{ recordedAt: Date; weightKg: number }>>;
 }
 
