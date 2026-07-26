@@ -59,6 +59,19 @@ npm run start:dev
 
 Seed catalog: `npm run prisma:seed`
 
+## Workout endpoints
+
+| Method | Path | Auth |
+|--------|------|------|
+| POST | `/workouts` | Bearer |
+| GET | `/workouts` | Bearer |
+| GET | `/workouts/:id` | Bearer |
+| PATCH | `/workouts/:id` | Bearer |
+| DELETE | `/workouts/:id` | Bearer |
+| POST | `/workouts/:id/complete` | Bearer |
+| POST/PATCH/DELETE | `/workouts/:id/exercises...` | Bearer |
+| POST/PATCH/DELETE | `/workouts/:id/.../sets` | Bearer |
+
 ## Tests
 
 ```bash

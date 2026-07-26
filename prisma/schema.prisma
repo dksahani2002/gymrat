@@ -63,6 +63,20 @@ enum MuscleRole {
   SECONDARY
 }
 
+enum WorkoutSource {
+  MANUAL
+  AI_TEXT
+  AI_VOICE
+  AI_OCR
+  IMPORT
+}
+
+enum WorkoutStatus {
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
 model User {
   id              String     @id @default(uuid()) @db.Uuid
   email           String     @unique
@@ -82,6 +96,7 @@ model User {
   notifications           Notification[]
   notificationPreferences NotificationPreference?
   auditLogs               AuditLog[]             @relation("AuditActor")
+  workouts                Workout[]
 
   @@map("users")
 }
@@ -243,6 +258,7 @@ model Exercise {
   equipment Equipment?        @relation(fields: [equipmentId], references: [id])
   muscles   ExerciseMuscle[]
   aliases   ExerciseAlias[]
+  workoutExercises WorkoutExercise[]
 
   @@index([name])
   @@index([createdById])
@@ -273,4 +289,82 @@ model ExerciseAlias {
   @@unique([alias])
   @@index([alias])
   @@map("exercise_aliases")
+}
+
+// ─── Workouts ────────────────────────────────────────────
+
+model Workout {
+  id          String        @id @default(uuid()) @db.Uuid
+  userId      String        @map("user_id") @db.Uuid
+  title       String?
+  notes       String?
+  source      WorkoutSource @default(MANUAL)
+  status      WorkoutStatus @default(IN_PROGRESS)
+  startedAt   DateTime      @map("started_at") @db.Timestamptz(6)
+  completedAt DateTime?     @map("completed_at") @db.Timestamptz(6)
+  durationSec Int?          @map("duration_sec")
+  createdAt   DateTime      @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt   DateTime      @updatedAt @map("updated_at") @db.Timestamptz(6)
+  deletedAt   DateTime?     @map("deleted_at") @db.Timestamptz(6)
+
+  user      User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  exercises WorkoutExercise[]
+
+  @@index([userId, completedAt(sort: Desc)])
+  @@index([userId, startedAt(sort: Desc)])
+  @@index([userId, deletedAt])
+  @@map("workouts")
+}
+
+model WorkoutExercise {
+  id         String  @id @default(uuid()) @db.Uuid
+  workoutId  String  @map("workout_id") @db.Uuid
+  exerciseId String  @map("exercise_id") @db.Uuid
+  position   Int
+  notes      String?
+
+  workout  Workout       @relation(fields: [workoutId], references: [id], onDelete: Cascade)
+  exercise Exercise      @relation(fields: [exerciseId], references: [id])
+  sets     WorkoutSet[]
+
+  @@unique([workoutId, position])
+  @@index([workoutId])
+  @@index([exerciseId])
+  @@map("workout_exercises")
+}
+
+model WorkoutSet {
+  id                String     @id @default(uuid()) @db.Uuid
+  workoutExerciseId String     @map("workout_exercise_id") @db.Uuid
+  setNumber         Int        @map("set_number")
+  reps              Int?
+  weight            Decimal?   @db.Decimal(8, 2)
+  weightUnit        WeightUnit @default(KG) @map("weight_unit")
+  weightKg          Decimal?   @map("weight_kg") @db.Decimal(8, 2)
+  rpe               Decimal?   @db.Decimal(3, 1)
+  durationSec       Int?       @map("duration_sec")
+  distanceM         Decimal?   @map("distance_m") @db.Decimal(10, 2)
+  isWarmup          Boolean    @default(false) @map("is_warmup")
+  isFailure         Boolean    @default(false) @map("is_failure")
+  notes             String?
+  createdAt         DateTime   @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  workoutExercise WorkoutExercise @relation(fields: [workoutExerciseId], references: [id], onDelete: Cascade)
+
+  @@unique([workoutExerciseId, setNumber])
+  @@index([workoutExerciseId])
+  @@map("workout_sets")
+}
+
+model WorkoutIdempotencyKey {
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String   @map("user_id") @db.Uuid
+  key       String
+  workoutId String?  @map("workout_id") @db.Uuid
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  expiresAt DateTime @map("expires_at") @db.Timestamptz(6)
+
+  @@unique([userId, key])
+  @@index([expiresAt])
+  @@map("workout_idempotency_keys")
 }
