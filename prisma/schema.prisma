@@ -84,6 +84,20 @@ enum PrType {
   ESTIMATED_1RM
 }
 
+enum GoalType {
+  STRENGTH
+  BODY_WEIGHT
+  FREQUENCY
+  VOLUME
+  CUSTOM
+}
+
+enum GoalStatus {
+  ACTIVE
+  COMPLETED
+  ABANDONED
+}
+
 model User {
   id              String     @id @default(uuid()) @db.Uuid
   email           String     @unique
@@ -112,6 +126,7 @@ model User {
   exerciseStats           ExerciseStat[]
   bodyWeightEntries       BodyWeightEntry[]
   bodyMeasurements        BodyMeasurement[]
+  goals                   Goal[]
 
   @@map("users")
 }
@@ -277,6 +292,7 @@ model Exercise {
   workoutExercises WorkoutExercise[]
   personalRecords  PersonalRecord[]
   exerciseStats    ExerciseStat[]
+  goals            Goal[]
 
   @@index([name])
   @@index([createdById])
@@ -540,4 +556,30 @@ model BodyMeasurement {
   @@index([userId, recordedAt(sort: Desc)])
   @@index([userId, deletedAt])
   @@map("body_measurements")
+}
+
+// ─── Goals ───────────────────────────────────────────────
+
+model Goal {
+  id          String     @id @default(uuid()) @db.Uuid
+  userId      String     @map("user_id") @db.Uuid
+  type        GoalType
+  title       String
+  targetValue Decimal?   @map("target_value") @db.Decimal(12, 2)
+  targetUnit  String?    @map("target_unit")
+  exerciseId  String?    @map("exercise_id") @db.Uuid
+  status      GoalStatus @default(ACTIVE)
+  startsAt    DateTime   @map("starts_at") @db.Timestamptz(6)
+  targetDate  DateTime?  @map("target_date") @db.Timestamptz(6)
+  completedAt DateTime?  @map("completed_at") @db.Timestamptz(6)
+  createdAt   DateTime   @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt   DateTime   @updatedAt @map("updated_at") @db.Timestamptz(6)
+  deletedAt   DateTime?  @map("deleted_at") @db.Timestamptz(6)
+
+  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  exercise Exercise? @relation(fields: [exerciseId], references: [id])
+
+  @@index([userId, status])
+  @@index([userId, deletedAt])
+  @@map("goals")
 }

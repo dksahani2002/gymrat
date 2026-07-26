@@ -137,6 +137,19 @@ See `docs/phase-1/body-weight-implementation.md`.
 
 See `docs/phase-1/measurements-implementation.md`.
 
+## Goals endpoints
+
+| Method | Path | Auth |
+|--------|------|------|
+| POST | `/goals` | Bearer |
+| GET | `/goals` | Bearer |
+| GET | `/goals/:id` | Bearer |
+| PATCH | `/goals/:id` | Bearer |
+| POST | `/goals/:id/complete` | Bearer |
+| DELETE | `/goals/:id` | Bearer |
+
+See `docs/phase-1/goals-implementation.md`.
+
 ## Tests
 
 ```bash
