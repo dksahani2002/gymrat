@@ -1,0 +1,27 @@
+export default () => ({
+  nodeEnv: process.env.NODE_ENV ?? 'development',
+  port: parseInt(process.env.PORT ?? '3000', 10),
+  apiPrefix: process.env.API_PREFIX ?? 'api/v1',
+  databaseUrl: process.env.DATABASE_URL,
+  redisUrl: process.env.REDIS_URL ?? 'redis://localhost:6379',
+  auth: {
+    accessSecret: process.env.JWT_ACCESS_SECRET,
+    accessExpiresIn: process.env.JWT_ACCESS_EXPIRES_IN ?? '15m',
+    refreshExpiresDays: parseInt(process.env.JWT_REFRESH_EXPIRES_DAYS ?? '30', 10),
+    googleClientIds: (process.env.GOOGLE_CLIENT_IDS ?? '')
+      .split(',')
+      .map((id) => id.trim())
+      .filter(Boolean),
+  },
+  appUrl: process.env.APP_URL ?? 'http://localhost:3000',
+  frontendUrl: process.env.FRONTEND_URL ?? 'http://localhost:5173',
+  mail: {
+    from: process.env.MAIL_FROM ?? 'noreply@gymrat.local',
+    logResetTokens: process.env.MAIL_LOG_RESET_TOKENS === 'true',
+  },
+  throttle: {
+    ttlMs: parseInt(process.env.THROTTLE_TTL_MS ?? '60000', 10),
+    limit: parseInt(process.env.THROTTLE_LIMIT ?? '100', 10),
+    authLimit: parseInt(process.env.AUTH_THROTTLE_LIMIT ?? '10', 10),
+  },
+});

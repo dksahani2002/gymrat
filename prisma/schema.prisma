@@ -1,0 +1,187 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum UserStatus {
+  ACTIVE
+  SUSPENDED
+  DELETED
+}
+
+enum Gender {
+  MALE
+  FEMALE
+  OTHER
+  PREFER_NOT_TO_SAY
+}
+
+enum FitnessGoal {
+  LOSE_FAT
+  BUILD_MUSCLE
+  STRENGTH
+  ENDURANCE
+  GENERAL_FITNESS
+  RECOMPOSITION
+}
+
+enum ActivityLevel {
+  SEDENTARY
+  LIGHT
+  MODERATE
+  ACTIVE
+  VERY_ACTIVE
+}
+
+enum WeightUnit {
+  KG
+  LB
+}
+
+enum HeightUnit {
+  CM
+  IN
+}
+
+enum NotificationChannel {
+  IN_APP
+  EMAIL
+  PUSH
+}
+
+model User {
+  id              String     @id @default(uuid()) @db.Uuid
+  email           String     @unique
+  passwordHash    String?    @map("password_hash")
+  googleSub       String?    @unique @map("google_sub")
+  role            Role       @default(USER)
+  status          UserStatus @default(ACTIVE)
+  emailVerifiedAt DateTime?  @map("email_verified_at") @db.Timestamptz(6)
+  lastLoginAt     DateTime?  @map("last_login_at") @db.Timestamptz(6)
+  createdAt       DateTime   @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt       DateTime   @updatedAt @map("updated_at") @db.Timestamptz(6)
+  deletedAt       DateTime?  @map("deleted_at") @db.Timestamptz(6)
+
+  profile                 UserProfile?
+  refreshTokens           RefreshToken[]
+  passwordResetTokens     PasswordResetToken[]
+  notifications           Notification[]
+  notificationPreferences NotificationPreference?
+  auditLogs               AuditLog[]             @relation("AuditActor")
+
+  @@map("users")
+}
+
+model UserProfile {
+  id                  String         @id @default(uuid()) @db.Uuid
+  userId              String         @unique @map("user_id") @db.Uuid
+  displayName         String?        @map("display_name")
+  dateOfBirth         DateTime?      @map("date_of_birth") @db.Date
+  gender              Gender?
+  heightValue         Decimal?       @map("height_value") @db.Decimal(8, 2)
+  heightUnit          HeightUnit     @default(CM) @map("height_unit")
+  fitnessGoal         FitnessGoal?   @map("fitness_goal")
+  activityLevel       ActivityLevel? @map("activity_level")
+  preferredWeightUnit WeightUnit     @default(KG) @map("preferred_weight_unit")
+  timezone            String         @default("UTC")
+  createdAt           DateTime       @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt           DateTime       @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_profiles")
+}
+
+model RefreshToken {
+  id           String    @id @default(uuid()) @db.Uuid
+  userId       String    @map("user_id") @db.Uuid
+  tokenHash    String    @map("token_hash")
+  familyId     String    @map("family_id") @db.Uuid
+  expiresAt    DateTime  @map("expires_at") @db.Timestamptz(6)
+  revokedAt    DateTime? @map("revoked_at") @db.Timestamptz(6)
+  replacedById String?   @map("replaced_by_id") @db.Uuid
+  userAgent    String?   @map("user_agent")
+  ip           String?
+  createdAt    DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([tokenHash])
+  @@index([familyId])
+  @@map("refresh_tokens")
+}
+
+model PasswordResetToken {
+  id        String    @id @default(uuid()) @db.Uuid
+  userId    String    @map("user_id") @db.Uuid
+  tokenHash String    @map("token_hash")
+  expiresAt DateTime  @map("expires_at") @db.Timestamptz(6)
+  usedAt    DateTime? @map("used_at") @db.Timestamptz(6)
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([tokenHash])
+  @@map("password_reset_tokens")
+}
+
+model Notification {
+  id        String              @id @default(uuid()) @db.Uuid
+  userId    String              @map("user_id") @db.Uuid
+  channel   NotificationChannel @default(IN_APP)
+  type      String
+  title     String
+  body      String
+  payload   Json?
+  readAt    DateTime?           @map("read_at") @db.Timestamptz(6)
+  createdAt DateTime            @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt(sort: Desc)])
+  @@map("notifications")
+}
+
+model NotificationPreference {
+  id               String  @id @default(uuid()) @db.Uuid
+  userId           String  @unique @map("user_id") @db.Uuid
+  emailEnabled     Boolean @default(true) @map("email_enabled")
+  pushEnabled      Boolean @default(true) @map("push_enabled")
+  workoutReminders Boolean @default(true) @map("workout_reminders")
+  prAlerts         Boolean @default(true) @map("pr_alerts")
+  weeklySummary    Boolean @default(true) @map("weekly_summary")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("notification_preferences")
+}
+
+model AuditLog {
+  id           String   @id @default(uuid()) @db.Uuid
+  actorId      String?  @map("actor_id") @db.Uuid
+  action       String
+  resourceType String   @map("resource_type")
+  resourceId   String?  @map("resource_id")
+  beforeJson   Json?    @map("before_json")
+  afterJson    Json?    @map("after_json")
+  ip           String?
+  userAgent    String?  @map("user_agent")
+  requestId    String?  @map("request_id")
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  actor User? @relation("AuditActor", fields: [actorId], references: [id])
+
+  @@index([actorId, createdAt(sort: Desc)])
+  @@index([resourceType, resourceId])
+  @@map("audit_logs")
+}
