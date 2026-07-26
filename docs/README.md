@@ -25,6 +25,7 @@
 | 9 | [Workout Logging Flow](./phase-1/09-workout-logging-flow.md) | Text/voice → structured data |
 | — | [AI Parser Implementation](./phase-1/ai-parser-implementation.md) | Parse-text/voice ports, rules parser, logs |
 | — | [Personal Records Implementation](./phase-1/personal-records-implementation.md) | PR detection on workout.completed |
+| — | [Analytics Implementation](./phase-1/analytics-implementation.md) | Snapshots, streak, charts |
 | 10 | [Analytics Engine](./phase-1/10-analytics-engine.md) | Volume, PRs, charts, jobs |
 | 11 | [Progressive Overload](./phase-1/11-progressive-overload.md) | Algorithm & recommendation rules |
 | 12 | [Project Roadmap](./phase-1/12-roadmap.md) | Phased delivery |

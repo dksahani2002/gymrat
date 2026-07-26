@@ -18,6 +18,8 @@ export class WorkoutDeletedEvent extends DomainEvent {
   constructor(
     public readonly workoutId: string,
     public readonly userId: string,
+    public readonly startedAt: Date,
+    public readonly completedAt: Date | null,
   ) {
     super();
   }
