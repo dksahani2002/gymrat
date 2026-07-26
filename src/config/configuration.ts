@@ -31,4 +31,14 @@ export default () => ({
     voiceStorageDir: process.env.VOICE_STORAGE_DIR ?? './storage/voice',
     maxVoiceBytes: parseInt(process.env.MAX_VOICE_BYTES ?? String(25 * 1024 * 1024), 10),
   },
+  overload: {
+    lookbackSessions: parseInt(process.env.OVERLOAD_LOOKBACK_SESSIONS ?? '3', 10),
+    barbellIncrementKg: parseFloat(process.env.OVERLOAD_BARBELL_INCREMENT_KG ?? '2.5'),
+    dumbbellIncrementKg: parseFloat(process.env.OVERLOAD_DUMBBELL_INCREMENT_KG ?? '2'),
+    deloadConsecutiveFails: parseInt(process.env.OVERLOAD_DELOAD_FAILS ?? '2', 10),
+    deloadPercent: parseFloat(process.env.OVERLOAD_DELOAD_PERCENT ?? '0.10'),
+    detrainDays: parseInt(process.env.OVERLOAD_DETRAIN_DAYS ?? '14', 10),
+    recentDays: parseInt(process.env.OVERLOAD_RECENT_DAYS ?? '28', 10),
+    cacheTtlSec: parseInt(process.env.OVERLOAD_CACHE_TTL_SEC ?? '900', 10),
+  },
 });
