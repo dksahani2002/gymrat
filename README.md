@@ -44,6 +44,21 @@ npm run start:dev
 | GET | `/users/me/preferences` | Bearer |
 | PATCH | `/users/me/preferences` | Bearer |
 
+## Exercise endpoints
+
+| Method | Path | Auth |
+|--------|------|------|
+| GET | `/exercises` | Bearer |
+| GET | `/exercises/:id` | Bearer |
+| GET | `/exercises/categories` | Bearer |
+| GET | `/exercises/muscles` | Bearer |
+| GET | `/exercises/equipment` | Bearer |
+| POST | `/exercises` | Bearer |
+| PATCH | `/exercises/:id` | Bearer |
+| DELETE | `/exercises/:id` | Bearer |
+
+Seed catalog: `npm run prisma:seed`
+
 ## Tests
 
 ```bash
