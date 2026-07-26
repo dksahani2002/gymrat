@@ -127,6 +127,7 @@ model User {
   bodyWeightEntries       BodyWeightEntry[]
   bodyMeasurements        BodyMeasurement[]
   goals                   Goal[]
+  plannedWorkouts         PlannedWorkout[]
 
   @@map("users")
 }
@@ -582,4 +583,22 @@ model Goal {
   @@index([userId, status])
   @@index([userId, deletedAt])
   @@map("goals")
+}
+
+// ─── Calendar ────────────────────────────────────────────
+
+model PlannedWorkout {
+  id          String    @id @default(uuid()) @db.Uuid
+  userId      String    @map("user_id") @db.Uuid
+  title       String?
+  plannedDate DateTime  @map("planned_date") @db.Date
+  notes       String?
+  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  deletedAt   DateTime? @map("deleted_at") @db.Timestamptz(6)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, plannedDate])
+  @@index([userId, deletedAt])
+  @@map("planned_workouts")
 }

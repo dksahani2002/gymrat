@@ -150,6 +150,17 @@ See `docs/phase-1/measurements-implementation.md`.
 
 See `docs/phase-1/goals-implementation.md`.
 
+## Calendar endpoints
+
+| Method | Path | Auth |
+|--------|------|------|
+| GET | `/calendar` | Bearer |
+| POST | `/calendar/planned` | Bearer |
+| PATCH | `/calendar/planned/:id` | Bearer |
+| DELETE | `/calendar/planned/:id` | Bearer |
+
+See `docs/phase-1/calendar-implementation.md`.
+
 ## Tests
 
 ```bash
