@@ -1,0 +1,625 @@
+# 04 — Prisma Models
+
+> Draft schema for Phase 1. File target: `prisma/schema.prisma`.  
+> This is documentation — not yet applied. Review before `prisma migrate`.
+
+```prisma
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["fullTextSearch", "postgresqlExtensions"]
+}
+
+datasource db {
+  provider   = "postgresql"
+  url        = env("DATABASE_URL")
+  extensions = [pgcrypto, pg_trgm, citext]
+}
+
+// ─── Enums ───────────────────────────────────────────────
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum UserStatus {
+  ACTIVE
+  SUSPENDED
+  DELETED
+}
+
+enum Gender {
+  MALE
+  FEMALE
+  OTHER
+  PREFER_NOT_TO_SAY
+}
+
+enum FitnessGoal {
+  LOSE_FAT
+  BUILD_MUSCLE
+  STRENGTH
+  ENDURANCE
+  GENERAL_FITNESS
+  RECOMPOSITION
+}
+
+enum ActivityLevel {
+  SEDENTARY
+  LIGHT
+  MODERATE
+  ACTIVE
+  VERY_ACTIVE
+}
+
+enum WeightUnit {
+  KG
+  LB
+}
+
+enum HeightUnit {
+  CM
+  IN
+}
+
+enum MuscleRole {
+  PRIMARY
+  SECONDARY
+}
+
+enum WorkoutSource {
+  MANUAL
+  AI_TEXT
+  AI_VOICE
+  AI_OCR
+  IMPORT
+}
+
+enum WorkoutStatus {
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+enum PrType {
+  MAX_WEIGHT
+  MAX_REPS
+  MAX_VOLUME
+  ESTIMATED_1RM
+}
+
+enum GoalType {
+  STRENGTH
+  BODY_WEIGHT
+  FREQUENCY
+  VOLUME
+  CUSTOM
+}
+
+enum GoalStatus {
+  ACTIVE
+  COMPLETED
+  ABANDONED
+}
+
+enum NotificationChannel {
+  IN_APP
+  EMAIL
+  PUSH
+}
+
+// ─── Identity ────────────────────────────────────────────
+
+model User {
+  id           String     @id @default(uuid()) @db.Uuid
+  email        String     @unique @db.Citext
+  passwordHash String?    @map("password_hash")
+  googleSub    String?    @unique @map("google_sub")
+  role         Role       @default(USER)
+  status       UserStatus @default(ACTIVE)
+  emailVerifiedAt DateTime? @map("email_verified_at") @db.Timestamptz
+  lastLoginAt  DateTime?  @map("last_login_at") @db.Timestamptz
+  createdAt    DateTime   @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt    DateTime   @updatedAt @map("updated_at") @db.Timestamptz
+  deletedAt    DateTime?  @map("deleted_at") @db.Timestamptz
+
+  profile                 UserProfile?
+  refreshTokens           RefreshToken[]
+  passwordResetTokens     PasswordResetToken[]
+  workouts                Workout[]
+  personalRecords         PersonalRecord[]
+  bodyWeightEntries       BodyWeightEntry[]
+  bodyMeasurements        BodyMeasurement[]
+  goals                   Goal[]
+  plannedWorkouts         PlannedWorkout[]
+  notifications           Notification[]
+  notificationPreferences NotificationPreference?
+  pushTokens              DevicePushToken[]
+  analyticsDaily          AnalyticsDailySnapshot[]
+  analyticsWeekly         AnalyticsWeeklySnapshot[]
+  muscleVolumeDaily       MuscleVolumeDaily[]
+  exerciseStats           ExerciseStat[]
+  aiParseLogs             AiParseLog[]
+  auditLogs               AuditLog[]             @relation("AuditActor")
+
+  @@map("users")
+}
+
+model UserProfile {
+  id              String         @id @default(uuid()) @db.Uuid
+  userId          String         @unique @map("user_id") @db.Uuid
+  displayName     String?        @map("display_name")
+  dateOfBirth     DateTime?      @map("date_of_birth") @db.Date
+  gender          Gender?
+  heightValue     Decimal?       @map("height_value") @db.Decimal(8, 2)
+  heightUnit      HeightUnit     @default(CM) @map("height_unit")
+  fitnessGoal     FitnessGoal?   @map("fitness_goal")
+  activityLevel   ActivityLevel? @map("activity_level")
+  preferredWeightUnit WeightUnit @default(KG) @map("preferred_weight_unit")
+  timezone        String         @default("UTC")
+  createdAt       DateTime       @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt       DateTime       @updatedAt @map("updated_at") @db.Timestamptz
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_profiles")
+}
+
+model RefreshToken {
+  id        String    @id @default(uuid()) @db.Uuid
+  userId    String    @map("user_id") @db.Uuid
+  tokenHash String    @map("token_hash")
+  familyId  String    @map("family_id") @db.Uuid
+  expiresAt DateTime  @map("expires_at") @db.Timestamptz
+  revokedAt DateTime? @map("revoked_at") @db.Timestamptz
+  replacedById String? @map("replaced_by_id") @db.Uuid
+  userAgent String?   @map("user_agent")
+  ip        String?
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([tokenHash])
+  @@index([familyId])
+  @@map("refresh_tokens")
+}
+
+model PasswordResetToken {
+  id        String    @id @default(uuid()) @db.Uuid
+  userId    String    @map("user_id") @db.Uuid
+  tokenHash String    @map("token_hash")
+  expiresAt DateTime  @map("expires_at") @db.Timestamptz
+  usedAt    DateTime? @map("used_at") @db.Timestamptz
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([tokenHash])
+  @@map("password_reset_tokens")
+}
+
+// ─── Exercise Catalog ────────────────────────────────────
+
+model MuscleGroup {
+  id        String   @id @default(uuid()) @db.Uuid
+  slug      String   @unique
+  name      String
+  parentId  String?  @map("parent_id") @db.Uuid
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz
+
+  parent           MuscleGroup?      @relation("MuscleTree", fields: [parentId], references: [id])
+  children         MuscleGroup[]     @relation("MuscleTree")
+  exerciseMuscles  ExerciseMuscle[]
+  muscleVolumeDaily MuscleVolumeDaily[]
+
+  @@map("muscle_groups")
+}
+
+model Equipment {
+  id        String   @id @default(uuid()) @db.Uuid
+  slug      String   @unique
+  name      String
+  exercises Exercise[]
+
+  @@map("equipment")
+}
+
+model ExerciseCategory {
+  id        String     @id @default(uuid()) @db.Uuid
+  slug      String     @unique
+  name      String
+  exercises Exercise[]
+
+  @@map("exercise_categories")
+}
+
+model Exercise {
+  id           String   @id @default(uuid()) @db.Uuid
+  slug         String   @unique
+  name         String
+  description  String?
+  categoryId   String?  @map("category_id") @db.Uuid
+  equipmentId  String?  @map("equipment_id") @db.Uuid
+  isCustom     Boolean  @default(false) @map("is_custom")
+  createdById  String?  @map("created_by_id") @db.Uuid
+  isActive     Boolean  @default(true) @map("is_active")
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt    DateTime @updatedAt @map("updated_at") @db.Timestamptz
+  deletedAt    DateTime? @map("deleted_at") @db.Timestamptz
+
+  category         ExerciseCategory?  @relation(fields: [categoryId], references: [id])
+  equipment        Equipment?         @relation(fields: [equipmentId], references: [id])
+  muscles          ExerciseMuscle[]
+  aliases          ExerciseAlias[]
+  workoutExercises WorkoutExercise[]
+  personalRecords  PersonalRecord[]
+  exerciseStats    ExerciseStat[]
+
+  @@index([name])
+  @@map("exercises")
+}
+
+model ExerciseMuscle {
+  exerciseId    String     @map("exercise_id") @db.Uuid
+  muscleGroupId String     @map("muscle_group_id") @db.Uuid
+  role          MuscleRole @default(PRIMARY)
+
+  exercise    Exercise    @relation(fields: [exerciseId], references: [id], onDelete: Cascade)
+  muscleGroup MuscleGroup @relation(fields: [muscleGroupId], references: [id], onDelete: Cascade)
+
+  @@id([exerciseId, muscleGroupId, role])
+  @@map("exercise_muscles")
+}
+
+model ExerciseAlias {
+  id         String @id @default(uuid()) @db.Uuid
+  exerciseId String @map("exercise_id") @db.Uuid
+  alias      String
+
+  exercise Exercise @relation(fields: [exerciseId], references: [id], onDelete: Cascade)
+
+  @@unique([alias])
+  @@index([alias])
+  @@map("exercise_aliases")
+}
+
+// ─── Workouts ────────────────────────────────────────────
+
+model Workout {
+  id          String        @id @default(uuid()) @db.Uuid
+  userId      String        @map("user_id") @db.Uuid
+  title       String?
+  notes       String?
+  source      WorkoutSource @default(MANUAL)
+  status      WorkoutStatus @default(IN_PROGRESS)
+  startedAt   DateTime      @map("started_at") @db.Timestamptz
+  completedAt DateTime?     @map("completed_at") @db.Timestamptz
+  durationSec Int?          @map("duration_sec")
+  createdAt   DateTime      @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt   DateTime      @updatedAt @map("updated_at") @db.Timestamptz
+  deletedAt   DateTime?     @map("deleted_at") @db.Timestamptz
+
+  user      User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  exercises WorkoutExercise[]
+
+  @@index([userId, completedAt(sort: Desc)])
+  @@index([userId, startedAt(sort: Desc)])
+  @@map("workouts")
+}
+
+model WorkoutExercise {
+  id         String  @id @default(uuid()) @db.Uuid
+  workoutId  String  @map("workout_id") @db.Uuid
+  exerciseId String  @map("exercise_id") @db.Uuid
+  position   Int
+  notes      String?
+
+  workout  Workout       @relation(fields: [workoutId], references: [id], onDelete: Cascade)
+  exercise Exercise      @relation(fields: [exerciseId], references: [id])
+  sets     WorkoutSet[]
+
+  @@unique([workoutId, position])
+  @@index([workoutId])
+  @@index([exerciseId])
+  @@map("workout_exercises")
+}
+
+model WorkoutSet {
+  id                String     @id @default(uuid()) @db.Uuid
+  workoutExerciseId String     @map("workout_exercise_id") @db.Uuid
+  setNumber         Int        @map("set_number")
+  reps              Int?
+  weight            Decimal?   @db.Decimal(8, 2)
+  weightUnit        WeightUnit @default(KG) @map("weight_unit")
+  weightKg          Decimal?   @map("weight_kg") @db.Decimal(8, 2)
+  rpe               Decimal?   @db.Decimal(3, 1)
+  durationSec       Int?       @map("duration_sec")
+  distanceM         Decimal?   @map("distance_m") @db.Decimal(10, 2)
+  isWarmup          Boolean    @default(false) @map("is_warmup")
+  isFailure         Boolean    @default(false) @map("is_failure")
+  notes             String?
+  createdAt         DateTime   @default(now()) @map("created_at") @db.Timestamptz
+
+  workoutExercise WorkoutExercise @relation(fields: [workoutExerciseId], references: [id], onDelete: Cascade)
+
+  @@unique([workoutExerciseId, setNumber])
+  @@index([workoutExerciseId])
+  @@map("workout_sets")
+}
+
+model WorkoutIdempotencyKey {
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String   @map("user_id") @db.Uuid
+  key       String
+  workoutId String?  @map("workout_id") @db.Uuid
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz
+  expiresAt DateTime @map("expires_at") @db.Timestamptz
+
+  @@unique([userId, key])
+  @@map("workout_idempotency_keys")
+}
+
+// ─── PRs & Analytics ─────────────────────────────────────
+
+model PersonalRecord {
+  id          String   @id @default(uuid()) @db.Uuid
+  userId      String   @map("user_id") @db.Uuid
+  exerciseId  String   @map("exercise_id") @db.Uuid
+  type        PrType
+  value       Decimal  @db.Decimal(12, 2)
+  unit        String?
+  workoutId   String?  @map("workout_id") @db.Uuid
+  achievedAt  DateTime @map("achieved_at") @db.Timestamptz
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz
+
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  exercise Exercise @relation(fields: [exerciseId], references: [id])
+
+  @@index([userId, exerciseId, achievedAt(sort: Desc)])
+  @@index([userId, type, achievedAt(sort: Desc)])
+  @@map("personal_records")
+}
+
+model AnalyticsDailySnapshot {
+  id              String   @id @default(uuid()) @db.Uuid
+  userId          String   @map("user_id") @db.Uuid
+  date            DateTime @db.Date
+  workoutCount    Int      @default(0) @map("workout_count")
+  totalVolumeKg   Decimal  @default(0) @map("total_volume_kg") @db.Decimal(14, 2)
+  totalDurationSec Int     @default(0) @map("total_duration_sec")
+  setCount        Int      @default(0) @map("set_count")
+  createdAt       DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt       DateTime @updatedAt @map("updated_at") @db.Timestamptz
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, date])
+  @@map("analytics_daily_snapshots")
+}
+
+model AnalyticsWeeklySnapshot {
+  id              String   @id @default(uuid()) @db.Uuid
+  userId          String   @map("user_id") @db.Uuid
+  weekStart       DateTime @map("week_start") @db.Date
+  workoutCount    Int      @default(0) @map("workout_count")
+  totalVolumeKg   Decimal  @default(0) @map("total_volume_kg") @db.Decimal(14, 2)
+  totalDurationSec Int     @default(0) @map("total_duration_sec")
+  trainingDays    Int      @default(0) @map("training_days")
+  createdAt       DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt       DateTime @updatedAt @map("updated_at") @db.Timestamptz
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, weekStart])
+  @@map("analytics_weekly_snapshots")
+}
+
+model MuscleVolumeDaily {
+  id            String   @id @default(uuid()) @db.Uuid
+  userId        String   @map("user_id") @db.Uuid
+  muscleGroupId String   @map("muscle_group_id") @db.Uuid
+  date          DateTime @db.Date
+  volumeKg      Decimal  @map("volume_kg") @db.Decimal(14, 2)
+  setCount      Int      @default(0) @map("set_count")
+
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  muscleGroup MuscleGroup @relation(fields: [muscleGroupId], references: [id])
+
+  @@unique([userId, muscleGroupId, date])
+  @@map("muscle_volume_daily")
+}
+
+model ExerciseStat {
+  id              String   @id @default(uuid()) @db.Uuid
+  userId          String   @map("user_id") @db.Uuid
+  exerciseId      String   @map("exercise_id") @db.Uuid
+  lastWeightKg    Decimal? @map("last_weight_kg") @db.Decimal(8, 2)
+  lastReps        Int?     @map("last_reps")
+  lastVolumeKg    Decimal? @map("last_volume_kg") @db.Decimal(14, 2)
+  bestWeightKg    Decimal? @map("best_weight_kg") @db.Decimal(8, 2)
+  bestEstimated1rmKg Decimal? @map("best_estimated_1rm_kg") @db.Decimal(8, 2)
+  totalSessions   Int      @default(0) @map("total_sessions")
+  lastPerformedAt DateTime? @map("last_performed_at") @db.Timestamptz
+  updatedAt       DateTime @updatedAt @map("updated_at") @db.Timestamptz
+
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  exercise Exercise @relation(fields: [exerciseId], references: [id])
+
+  @@unique([userId, exerciseId])
+  @@map("exercise_stats")
+}
+
+// ─── Body Metrics & Goals ────────────────────────────────
+
+model BodyWeightEntry {
+  id         String     @id @default(uuid()) @db.Uuid
+  userId     String     @map("user_id") @db.Uuid
+  weight     Decimal    @db.Decimal(8, 2)
+  unit       WeightUnit @default(KG)
+  weightKg   Decimal    @map("weight_kg") @db.Decimal(8, 2)
+  recordedAt DateTime   @map("recorded_at") @db.Timestamptz
+  notes      String?
+  createdAt  DateTime   @default(now()) @map("created_at") @db.Timestamptz
+  deletedAt  DateTime?  @map("deleted_at") @db.Timestamptz
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, recordedAt(sort: Desc)])
+  @@map("body_weight_entries")
+}
+
+model BodyMeasurement {
+  id         String    @id @default(uuid()) @db.Uuid
+  userId     String    @map("user_id") @db.Uuid
+  // JSON map of measurement_key -> value_cm for flexibility
+  measurements Json
+  recordedAt DateTime  @map("recorded_at") @db.Timestamptz
+  notes      String?
+  createdAt  DateTime  @default(now()) @map("created_at") @db.Timestamptz
+  deletedAt  DateTime? @map("deleted_at") @db.Timestamptz
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, recordedAt(sort: Desc)])
+  @@map("body_measurements")
+}
+
+model Goal {
+  id          String     @id @default(uuid()) @db.Uuid
+  userId      String     @map("user_id") @db.Uuid
+  type        GoalType
+  title       String
+  targetValue Decimal?   @map("target_value") @db.Decimal(12, 2)
+  targetUnit  String?    @map("target_unit")
+  exerciseId  String?    @map("exercise_id") @db.Uuid
+  status      GoalStatus @default(ACTIVE)
+  startsAt    DateTime   @map("starts_at") @db.Timestamptz
+  targetDate  DateTime?  @map("target_date") @db.Timestamptz
+  completedAt DateTime?  @map("completed_at") @db.Timestamptz
+  createdAt   DateTime   @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt   DateTime   @updatedAt @map("updated_at") @db.Timestamptz
+  deletedAt   DateTime?  @map("deleted_at") @db.Timestamptz
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, status])
+  @@map("goals")
+}
+
+model PlannedWorkout {
+  id          String   @id @default(uuid()) @db.Uuid
+  userId      String   @map("user_id") @db.Uuid
+  title       String?
+  plannedDate DateTime @map("planned_date") @db.Date
+  notes       String?
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz
+  deletedAt   DateTime? @map("deleted_at") @db.Timestamptz
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, plannedDate])
+  @@map("planned_workouts")
+}
+
+// ─── Notifications ───────────────────────────────────────
+
+model Notification {
+  id        String              @id @default(uuid()) @db.Uuid
+  userId    String              @map("user_id") @db.Uuid
+  channel   NotificationChannel @default(IN_APP)
+  type      String
+  title     String
+  body      String
+  payload   Json?
+  readAt    DateTime?           @map("read_at") @db.Timestamptz
+  createdAt DateTime            @default(now()) @map("created_at") @db.Timestamptz
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt(sort: Desc)])
+  @@map("notifications")
+}
+
+model NotificationPreference {
+  id               String  @id @default(uuid()) @db.Uuid
+  userId           String  @unique @map("user_id") @db.Uuid
+  emailEnabled     Boolean @default(true) @map("email_enabled")
+  pushEnabled      Boolean @default(true) @map("push_enabled")
+  workoutReminders Boolean @default(true) @map("workout_reminders")
+  prAlerts         Boolean @default(true) @map("pr_alerts")
+  weeklySummary    Boolean @default(true) @map("weekly_summary")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("notification_preferences")
+}
+
+model DevicePushToken {
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String   @map("user_id") @db.Uuid
+  token     String
+  platform  String
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz
+  revokedAt DateTime? @map("revoked_at") @db.Timestamptz
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, token])
+  @@map("device_push_tokens")
+}
+
+// ─── Platform ────────────────────────────────────────────
+
+model AuditLog {
+  id           String   @id @default(uuid()) @db.Uuid
+  actorId      String?  @map("actor_id") @db.Uuid
+  action       String
+  resourceType String   @map("resource_type")
+  resourceId   String?  @map("resource_id")
+  beforeJson   Json?    @map("before_json")
+  afterJson    Json?    @map("after_json")
+  ip           String?
+  userAgent    String?  @map("user_agent")
+  requestId    String?  @map("request_id")
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz
+
+  actor User? @relation("AuditActor", fields: [actorId], references: [id])
+
+  @@index([actorId, createdAt(sort: Desc)])
+  @@index([resourceType, resourceId])
+  @@map("audit_logs")
+}
+
+model AiParseLog {
+  id            String   @id @default(uuid()) @db.Uuid
+  userId        String   @map("user_id") @db.Uuid
+  modality      String   // TEXT | VOICE | OCR
+  provider      String
+  model         String?
+  inputHash     String   @map("input_hash")
+  latencyMs     Int      @map("latency_ms")
+  promptTokens  Int?     @map("prompt_tokens")
+  completionTokens Int?  @map("completion_tokens")
+  confidence    Decimal? @db.Decimal(4, 3)
+  success       Boolean
+  errorCode     String?  @map("error_code")
+  resultSummary Json?    @map("result_summary")
+  createdAt     DateTime @default(now()) @map("created_at") @db.Timestamptz
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt(sort: Desc)])
+  @@map("ai_parse_logs")
+}
+```
+
+## Post-Migration SQL (manual or Prisma `$executeRaw` migration)
+
+```sql
+CREATE INDEX CONCURRENTLY IF NOT EXISTS exercises_name_trgm_idx
+  ON exercises USING GIN (name gin_trgm_ops);
+
+CREATE INDEX CONCURRENTLY IF NOT EXISTS exercise_aliases_alias_trgm_idx
+  ON exercise_aliases USING GIN (alias gin_trgm_ops);
+```
