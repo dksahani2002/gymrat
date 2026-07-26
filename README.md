@@ -83,6 +83,15 @@ Seed catalog: `npm run prisma:seed`
 
 Drafts only — confirm via `POST /workouts`. See `docs/phase-1/ai-parser-implementation.md`.
 
+## Personal records endpoints
+
+| Method | Path | Auth |
+|--------|------|------|
+| GET | `/personal-records` | Bearer |
+| GET | `/personal-records/summary` | Bearer |
+
+Detected on `workout.completed`. See `docs/phase-1/personal-records-implementation.md`.
+
 ## Tests
 
 ```bash
