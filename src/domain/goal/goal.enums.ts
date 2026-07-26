@@ -1,0 +1,13 @@
+export enum GoalType {
+  STRENGTH = 'STRENGTH',
+  BODY_WEIGHT = 'BODY_WEIGHT',
+  FREQUENCY = 'FREQUENCY',
+  VOLUME = 'VOLUME',
+  CUSTOM = 'CUSTOM',
+}
+
+export enum GoalStatus {
+  ACTIVE = 'ACTIVE',
+  COMPLETED = 'COMPLETED',
+  ABANDONED = 'ABANDONED',
+}
