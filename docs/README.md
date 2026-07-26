@@ -28,6 +28,7 @@
 | — | [Analytics Implementation](./phase-1/analytics-implementation.md) | Snapshots, streak, charts |
 | — | [Progressive Overload Implementation](./phase-1/progressive-overload-implementation.md) | Next weight/reps suggestions |
 | — | [Body Weight Implementation](./phase-1/body-weight-implementation.md) | Weight logging + chart series |
+| — | [Measurements Implementation](./phase-1/measurements-implementation.md) | Circumference logging (cm) |
 | 10 | [Analytics Engine](./phase-1/10-analytics-engine.md) | Volume, PRs, charts, jobs |
 | 11 | [Progressive Overload](./phase-1/11-progressive-overload.md) | Algorithm & recommendation rules |
 | 12 | [Project Roadmap](./phase-1/12-roadmap.md) | Phased delivery |

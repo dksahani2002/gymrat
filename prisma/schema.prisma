@@ -111,6 +111,7 @@ model User {
   muscleVolumeDaily       MuscleVolumeDaily[]
   exerciseStats           ExerciseStat[]
   bodyWeightEntries       BodyWeightEntry[]
+  bodyMeasurements        BodyMeasurement[]
 
   @@map("users")
 }
@@ -522,4 +523,21 @@ model BodyWeightEntry {
   @@index([userId, recordedAt(sort: Desc)])
   @@index([userId, deletedAt])
   @@map("body_weight_entries")
+}
+
+model BodyMeasurement {
+  id           String    @id @default(uuid()) @db.Uuid
+  userId       String    @map("user_id") @db.Uuid
+  /// Map of measurement_key -> value_cm
+  measurements Json
+  recordedAt   DateTime  @map("recorded_at") @db.Timestamptz(6)
+  notes        String?
+  createdAt    DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  deletedAt    DateTime? @map("deleted_at") @db.Timestamptz(6)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, recordedAt(sort: Desc)])
+  @@index([userId, deletedAt])
+  @@map("body_measurements")
 }

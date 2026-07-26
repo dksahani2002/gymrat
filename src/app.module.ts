@@ -17,6 +17,7 @@ import { PersonalRecordsModule } from './modules/personal-records/personal-recor
 import { AnalyticsModule } from './modules/analytics/analytics.module';
 import { RecommendationsModule } from './modules/recommendations/recommendations.module';
 import { BodyWeightModule } from './modules/body-weight/body-weight.module';
+import { MeasurementsModule } from './modules/measurements/measurements.module';
 import { GlobalExceptionFilter } from './shared/filters/global-exception.filter';
 import { JwtAuthGuard } from './shared/guards/jwt-auth.guard';
 import { RolesGuard } from './shared/guards/roles.guard';
@@ -50,6 +51,7 @@ import { RequestIdMiddleware } from './shared/middleware/request-id.middleware';
     AnalyticsModule,
     RecommendationsModule,
     BodyWeightModule,
+    MeasurementsModule,
     AiModule,
     HealthModule,
   ],
