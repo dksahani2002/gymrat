@@ -16,7 +16,7 @@ Implements Phase 1 analytics from [10-analytics-engine.md](./10-analytics-engine
 | GET | `/analytics/duration` | Duration series |
 | GET | `/analytics/charts/:chartType` | Normalized `{ chartType, unit, points }` |
 
-`body_weight_over_time` returns empty points until body-metrics module ships.
+`body_weight_over_time` reads soft-deletable `body_weight_entries` (see [body-weight-implementation.md](./body-weight-implementation.md)).
 
 ## Recompute
 

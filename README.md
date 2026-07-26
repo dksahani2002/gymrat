@@ -117,6 +117,16 @@ See `docs/phase-1/analytics-implementation.md`.
 
 See `docs/phase-1/progressive-overload-implementation.md`.
 
+## Body weight endpoints
+
+| Method | Path | Auth |
+|--------|------|------|
+| POST | `/body-weight` | Bearer |
+| GET | `/body-weight` | Bearer |
+| DELETE | `/body-weight/:id` | Bearer |
+
+See `docs/phase-1/body-weight-implementation.md`.
+
 ## Tests
 
 ```bash
