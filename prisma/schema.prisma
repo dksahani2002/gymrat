@@ -58,6 +58,11 @@ enum NotificationChannel {
   PUSH
 }
 
+enum MuscleRole {
+  PRIMARY
+  SECONDARY
+}
+
 model User {
   id              String     @id @default(uuid()) @db.Uuid
   email           String     @unique
@@ -184,4 +189,88 @@ model AuditLog {
   @@index([actorId, createdAt(sort: Desc)])
   @@index([resourceType, resourceId])
   @@map("audit_logs")
+}
+
+// ─── Exercise Catalog ────────────────────────────────────
+
+model MuscleGroup {
+  id        String   @id @default(uuid()) @db.Uuid
+  slug      String   @unique
+  name      String
+  parentId  String?  @map("parent_id") @db.Uuid
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  parent          MuscleGroup?     @relation("MuscleTree", fields: [parentId], references: [id])
+  children        MuscleGroup[]    @relation("MuscleTree")
+  exerciseMuscles ExerciseMuscle[]
+
+  @@map("muscle_groups")
+}
+
+model Equipment {
+  id        String     @id @default(uuid()) @db.Uuid
+  slug      String     @unique
+  name      String
+  exercises Exercise[]
+
+  @@map("equipment")
+}
+
+model ExerciseCategory {
+  id        String     @id @default(uuid()) @db.Uuid
+  slug      String     @unique
+  name      String
+  exercises Exercise[]
+
+  @@map("exercise_categories")
+}
+
+model Exercise {
+  id          String    @id @default(uuid()) @db.Uuid
+  slug        String    @unique
+  name        String
+  description String?
+  categoryId  String?   @map("category_id") @db.Uuid
+  equipmentId String?   @map("equipment_id") @db.Uuid
+  isCustom    Boolean   @default(false) @map("is_custom")
+  createdById String?   @map("created_by_id") @db.Uuid
+  isActive    Boolean   @default(true) @map("is_active")
+  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt   DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
+  deletedAt   DateTime? @map("deleted_at") @db.Timestamptz(6)
+
+  category  ExerciseCategory? @relation(fields: [categoryId], references: [id])
+  equipment Equipment?        @relation(fields: [equipmentId], references: [id])
+  muscles   ExerciseMuscle[]
+  aliases   ExerciseAlias[]
+
+  @@index([name])
+  @@index([createdById])
+  @@index([categoryId])
+  @@index([deletedAt, isActive])
+  @@map("exercises")
+}
+
+model ExerciseMuscle {
+  exerciseId    String     @map("exercise_id") @db.Uuid
+  muscleGroupId String     @map("muscle_group_id") @db.Uuid
+  role          MuscleRole @default(PRIMARY)
+
+  exercise    Exercise    @relation(fields: [exerciseId], references: [id], onDelete: Cascade)
+  muscleGroup MuscleGroup @relation(fields: [muscleGroupId], references: [id], onDelete: Cascade)
+
+  @@id([exerciseId, muscleGroupId, role])
+  @@map("exercise_muscles")
+}
+
+model ExerciseAlias {
+  id         String @id @default(uuid()) @db.Uuid
+  exerciseId String @map("exercise_id") @db.Uuid
+  alias      String
+
+  exercise Exercise @relation(fields: [exerciseId], references: [id], onDelete: Cascade)
+
+  @@unique([alias])
+  @@index([alias])
+  @@map("exercise_aliases")
 }

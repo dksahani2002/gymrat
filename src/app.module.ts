@@ -8,6 +8,7 @@ import { validateEnv } from './config/env.validation';
 import { RedisModule } from './infrastructure/cache/redis.module';
 import { PrismaModule } from './infrastructure/persistence/prisma/prisma.module';
 import { AuthModule } from './modules/auth/auth.module';
+import { ExercisesModule } from './modules/exercises/exercises.module';
 import { HealthModule } from './modules/health/health.module';
 import { UsersModule } from './modules/users/users.module';
 import { GlobalExceptionFilter } from './shared/filters/global-exception.filter';
@@ -37,6 +38,7 @@ import { RequestIdMiddleware } from './shared/middleware/request-id.middleware';
     RedisModule,
     AuthModule,
     UsersModule,
+    ExercisesModule,
     HealthModule,
   ],
   providers: [

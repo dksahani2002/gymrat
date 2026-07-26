@@ -53,7 +53,7 @@ async function bootstrap(): Promise<void> {
   if (nodeEnv !== 'production') {
     const swaggerConfig = new DocumentBuilder()
       .setTitle('GymRat API')
-      .setDescription('AI Fitness Platform — Phase 1 Auth & Profile')
+      .setDescription('AI Fitness Platform — Phase 1 Auth, Profile & Exercises')
       .setVersion('0.1.0')
       .addBearerAuth()
       .build();
