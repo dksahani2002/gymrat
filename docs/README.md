@@ -31,6 +31,7 @@
 | — | [Measurements Implementation](./phase-1/measurements-implementation.md) | Circumference logging (cm) |
 | — | [Goals Implementation](./phase-1/goals-implementation.md) | Goal CRUD + progress |
 | — | [Calendar Implementation](./phase-1/calendar-implementation.md) | Completed + planned days |
+| — | [Notifications Implementation](./phase-1/notifications-implementation.md) | Inbox, prefs, push tokens |
 | 10 | [Analytics Engine](./phase-1/10-analytics-engine.md) | Volume, PRs, charts, jobs |
 | 11 | [Progressive Overload](./phase-1/11-progressive-overload.md) | Algorithm & recommendation rules |
 | 12 | [Project Roadmap](./phase-1/12-roadmap.md) | Phased delivery |

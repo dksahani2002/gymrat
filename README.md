@@ -161,6 +161,19 @@ See `docs/phase-1/goals-implementation.md`.
 
 See `docs/phase-1/calendar-implementation.md`.
 
+## Notifications endpoints
+
+| Method | Path | Auth |
+|--------|------|------|
+| GET | `/notifications` | Bearer |
+| POST | `/notifications/:id/read` | Bearer |
+| POST | `/notifications/read-all` | Bearer |
+| GET | `/notifications/preferences` | Bearer |
+| PATCH | `/notifications/preferences` | Bearer |
+| POST | `/notifications/push-tokens` | Bearer |
+
+See `docs/phase-1/notifications-implementation.md`.
+
 ## Tests
 
 ```bash
