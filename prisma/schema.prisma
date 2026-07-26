@@ -106,6 +106,10 @@ model User {
   workouts                Workout[]
   aiParseLogs             AiParseLog[]
   personalRecords         PersonalRecord[]
+  analyticsDaily          AnalyticsDailySnapshot[]
+  analyticsWeekly         AnalyticsWeeklySnapshot[]
+  muscleVolumeDaily       MuscleVolumeDaily[]
+  exerciseStats           ExerciseStat[]
 
   @@map("users")
 }
@@ -227,6 +231,7 @@ model MuscleGroup {
   parent          MuscleGroup?     @relation("MuscleTree", fields: [parentId], references: [id])
   children        MuscleGroup[]    @relation("MuscleTree")
   exerciseMuscles ExerciseMuscle[]
+  muscleVolumeDaily MuscleVolumeDaily[]
 
   @@map("muscle_groups")
 }
@@ -269,6 +274,7 @@ model Exercise {
   aliases          ExerciseAlias[]
   workoutExercises WorkoutExercise[]
   personalRecords  PersonalRecord[]
+  exerciseStats    ExerciseStat[]
 
   @@index([name])
   @@index([createdById])
@@ -421,4 +427,78 @@ model PersonalRecord {
   @@index([userId, exerciseId, achievedAt(sort: Desc)])
   @@index([userId, type, achievedAt(sort: Desc)])
   @@map("personal_records")
+}
+
+// ─── Analytics ───────────────────────────────────────────
+
+model AnalyticsDailySnapshot {
+  id               String   @id @default(uuid()) @db.Uuid
+  userId           String   @map("user_id") @db.Uuid
+  date             DateTime @db.Date
+  workoutCount     Int      @default(0) @map("workout_count")
+  totalVolumeKg    Decimal  @default(0) @map("total_volume_kg") @db.Decimal(14, 2)
+  totalDurationSec Int      @default(0) @map("total_duration_sec")
+  setCount         Int      @default(0) @map("set_count")
+  createdAt        DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt        DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, date])
+  @@index([userId, date])
+  @@map("analytics_daily_snapshots")
+}
+
+model AnalyticsWeeklySnapshot {
+  id               String   @id @default(uuid()) @db.Uuid
+  userId           String   @map("user_id") @db.Uuid
+  weekStart        DateTime @map("week_start") @db.Date
+  workoutCount     Int      @default(0) @map("workout_count")
+  totalVolumeKg    Decimal  @default(0) @map("total_volume_kg") @db.Decimal(14, 2)
+  totalDurationSec Int      @default(0) @map("total_duration_sec")
+  trainingDays     Int      @default(0) @map("training_days")
+  createdAt        DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt        DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, weekStart])
+  @@index([userId, weekStart])
+  @@map("analytics_weekly_snapshots")
+}
+
+model MuscleVolumeDaily {
+  id            String   @id @default(uuid()) @db.Uuid
+  userId        String   @map("user_id") @db.Uuid
+  muscleGroupId String   @map("muscle_group_id") @db.Uuid
+  date          DateTime @db.Date
+  volumeKg      Decimal  @map("volume_kg") @db.Decimal(14, 2)
+  setCount      Int      @default(0) @map("set_count")
+
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  muscleGroup MuscleGroup @relation(fields: [muscleGroupId], references: [id])
+
+  @@unique([userId, muscleGroupId, date])
+  @@index([userId, date])
+  @@map("muscle_volume_daily")
+}
+
+model ExerciseStat {
+  id                   String    @id @default(uuid()) @db.Uuid
+  userId               String    @map("user_id") @db.Uuid
+  exerciseId           String    @map("exercise_id") @db.Uuid
+  lastWeightKg         Decimal?  @map("last_weight_kg") @db.Decimal(8, 2)
+  lastReps             Int?      @map("last_reps")
+  lastVolumeKg         Decimal?  @map("last_volume_kg") @db.Decimal(14, 2)
+  bestWeightKg         Decimal?  @map("best_weight_kg") @db.Decimal(8, 2)
+  bestEstimated1rmKg   Decimal?  @map("best_estimated_1rm_kg") @db.Decimal(8, 2)
+  totalSessions        Int       @default(0) @map("total_sessions")
+  lastPerformedAt      DateTime? @map("last_performed_at") @db.Timestamptz(6)
+  updatedAt            DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  exercise Exercise @relation(fields: [exerciseId], references: [id])
+
+  @@unique([userId, exerciseId])
+  @@map("exercise_stats")
 }

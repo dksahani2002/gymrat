@@ -14,6 +14,7 @@ import { HealthModule } from './modules/health/health.module';
 import { UsersModule } from './modules/users/users.module';
 import { WorkoutsModule } from './modules/workouts/workouts.module';
 import { PersonalRecordsModule } from './modules/personal-records/personal-records.module';
+import { AnalyticsModule } from './modules/analytics/analytics.module';
 import { GlobalExceptionFilter } from './shared/filters/global-exception.filter';
 import { JwtAuthGuard } from './shared/guards/jwt-auth.guard';
 import { RolesGuard } from './shared/guards/roles.guard';
@@ -44,6 +45,7 @@ import { RequestIdMiddleware } from './shared/middleware/request-id.middleware';
     ExercisesModule,
     WorkoutsModule,
     PersonalRecordsModule,
+    AnalyticsModule,
     AiModule,
     HealthModule,
   ],

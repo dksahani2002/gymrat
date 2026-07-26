@@ -177,10 +177,15 @@ export class WorkoutApplicationService {
     workoutId: string,
     context: RequestContext,
   ): Promise<void> {
-    await this.requireOwned(workoutId, userId);
+    const existing = await this.requireOwned(workoutId, userId);
     await this.workouts.softDelete(workoutId, userId);
-    const event = new WorkoutDeletedEvent(workoutId, userId);
-    this.events.publish(event.eventName, event);
+    const event = new WorkoutDeletedEvent(
+      workoutId,
+      userId,
+      existing.startedAt,
+      existing.completedAt,
+    );
+    await this.events.publish(event.eventName, event);
     await this.audit.record({
       actorId: userId,
       action: 'workout.delete',

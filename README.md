@@ -92,6 +92,22 @@ Drafts only — confirm via `POST /workouts`. See `docs/phase-1/ai-parser-implem
 
 Detected on `workout.completed`. See `docs/phase-1/personal-records-implementation.md`.
 
+## Analytics endpoints
+
+| Method | Path | Auth |
+|--------|------|------|
+| GET | `/analytics/overview` | Bearer |
+| GET | `/analytics/volume` | Bearer |
+| GET | `/analytics/volume/exercise/:exerciseId` | Bearer |
+| GET | `/analytics/volume/muscle` | Bearer |
+| GET | `/analytics/estimated-1rm` | Bearer |
+| GET | `/analytics/frequency` | Bearer |
+| GET | `/analytics/consistency` | Bearer |
+| GET | `/analytics/duration` | Bearer |
+| GET | `/analytics/charts/:chartType` | Bearer |
+
+See `docs/phase-1/analytics-implementation.md`.
+
 ## Tests
 
 ```bash
