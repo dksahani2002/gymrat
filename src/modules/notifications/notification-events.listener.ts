@@ -6,7 +6,9 @@ import { PersonalRecordAchievedEvent } from '../../domain/personal-record/events
 
 @Injectable()
 export class NotificationEventsListener {
-  constructor(private readonly notifications: NotificationsApplicationService) {}
+  constructor(
+    private readonly notifications: NotificationsApplicationService,
+  ) {}
 
   @OnEvent('pr.achieved')
   async onPrAchieved(event: PersonalRecordAchievedEvent): Promise<void> {

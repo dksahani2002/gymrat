@@ -158,4 +158,3 @@ export interface AnalyticsRepository {
     to: Date,
   ): Promise<Array<{ recordedAt: Date; weightKg: number }>>;
 }
-

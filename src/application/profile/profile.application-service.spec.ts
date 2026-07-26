@@ -72,7 +72,9 @@ describe('ProfileApplicationService', () => {
 
     it('throws when profile missing', async () => {
       profiles.findByUserId.mockResolvedValue(null);
-      await expect(service.getMe('missing')).rejects.toBeInstanceOf(NotFoundError);
+      await expect(service.getMe('missing')).rejects.toBeInstanceOf(
+        NotFoundError,
+      );
     });
   });
 
@@ -98,7 +100,10 @@ describe('ProfileApplicationService', () => {
       expect(result.displayName).toBe('Alex Updated');
       expect(result.timezone).toBe('Asia/Kolkata');
       expect(audit.record).toHaveBeenCalled();
-      expect(events.publish).toHaveBeenCalledWith('profile.updated', expect.anything());
+      expect(events.publish).toHaveBeenCalledWith(
+        'profile.updated',
+        expect.anything(),
+      );
     });
 
     it('rejects invalid timezone', async () => {

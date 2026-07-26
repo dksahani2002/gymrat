@@ -21,7 +21,8 @@ export class OverloadPrismaRepository implements OverloadRepository {
     });
     return {
       fitnessGoal: (profile?.fitnessGoal as OverloadGoal | null) ?? null,
-      preferredWeightUnit: (profile?.preferredWeightUnit as 'KG' | 'LB') ?? 'KG',
+      preferredWeightUnit:
+        (profile?.preferredWeightUnit as 'KG' | 'LB') ?? 'KG',
     };
   }
 

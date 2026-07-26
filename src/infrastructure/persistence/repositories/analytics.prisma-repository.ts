@@ -69,7 +69,9 @@ export class AnalyticsPrismaRepository implements AnalyticsRepository {
     }));
   }
 
-  async findExerciseMuscles(exerciseIds: string[]): Promise<ExerciseMuscleLink[]> {
+  async findExerciseMuscles(
+    exerciseIds: string[],
+  ): Promise<ExerciseMuscleLink[]> {
     if (exerciseIds.length === 0) return [];
     const rows = await this.prisma.exerciseMuscle.findMany({
       where: { exerciseId: { in: exerciseIds } },

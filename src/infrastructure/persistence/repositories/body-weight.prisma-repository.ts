@@ -10,7 +10,10 @@ import {
   ListBodyWeightFilters,
   ListBodyWeightResult,
 } from '../../../domain/body-weight/repositories/body-weight.repository';
-import { NotFoundError, RepositoryError } from '../../../shared/errors/base.error';
+import {
+  NotFoundError,
+  RepositoryError,
+} from '../../../shared/errors/base.error';
 import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
@@ -74,7 +77,7 @@ export class BodyWeightPrismaRepository implements BodyWeightRepository {
     const page = hasMore ? rows.slice(0, filters.limit) : rows;
     return {
       items: page.map((row) => this.toDomain(row)),
-      nextCursor: hasMore ? page[page.length - 1]?.id ?? null : null,
+      nextCursor: hasMore ? (page[page.length - 1]?.id ?? null) : null,
     };
   }
 

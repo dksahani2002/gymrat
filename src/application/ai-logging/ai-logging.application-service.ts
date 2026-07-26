@@ -57,7 +57,8 @@ export class AiLoggingApplicationService {
     @Inject(EXERCISE_RESOLVER) private readonly resolver: ExerciseResolverPort,
     @Inject(SPEECH_TO_TEXT) private readonly stt: SpeechToTextPort,
     @Inject(OBJECT_STORAGE) private readonly storage: ObjectStoragePort,
-    @Inject(AI_PARSE_LOG_REPOSITORY) private readonly logs: AiParseLogRepository,
+    @Inject(AI_PARSE_LOG_REPOSITORY)
+    private readonly logs: AiParseLogRepository,
   ) {}
 
   async parseText(input: {

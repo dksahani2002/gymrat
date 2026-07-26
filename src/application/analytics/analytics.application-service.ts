@@ -45,7 +45,8 @@ export class AnalyticsApplicationService {
   private readonly cacheTtlSec = 900;
 
   constructor(
-    @Inject(ANALYTICS_REPOSITORY) private readonly analytics: AnalyticsRepository,
+    @Inject(ANALYTICS_REPOSITORY)
+    private readonly analytics: AnalyticsRepository,
     private readonly redis: RedisService,
   ) {}
 
@@ -57,6 +58,32 @@ export class AnalyticsApplicationService {
     const dateKey = dateKeyInTimeZone(input.anchorAt, timeZone);
     await this.recomputeLocalDate(input.userId, dateKey, timeZone);
     await this.invalidateCache(input.userId);
+  }
+
+  /**
+   * Idempotent backfill for a local-date range (admin / runbook).
+   */
+  async recomputeRange(input: {
+    userId: string;
+    from: string;
+    to: string;
+  }): Promise<{ days: number }> {
+    this.assertRange(input.from, input.to);
+    const timeZone = await this.analytics.getUserTimezone(input.userId);
+    let days = 0;
+    for (
+      let dateKey = input.from;
+      dateKey <= input.to;
+      dateKey = addDaysKey(dateKey, 1)
+    ) {
+      await this.recomputeLocalDate(input.userId, dateKey, timeZone);
+      days += 1;
+    }
+    await this.invalidateCache(input.userId);
+    this.logger.log(
+      `Recomputed analytics range user=${input.userId} from=${input.from} to=${input.to} days=${days}`,
+    );
+    return { days };
   }
 
   async overview(userId: string) {
@@ -318,7 +345,8 @@ export class AnalyticsApplicationService {
     const trainedDays = rows.filter((r) => r.workoutCount > 0).length;
     const daySpan =
       Math.round(
-        (parseDateKey(input.to).getTime() - parseDateKey(input.from).getTime()) /
+        (parseDateKey(input.to).getTime() -
+          parseDateKey(input.from).getTime()) /
           86_400_000,
       ) + 1;
     const weeks = Math.max(daySpan / 7, 1 / 7);
@@ -418,7 +446,11 @@ export class AnalyticsApplicationService {
           from: input.from,
           to: input.to,
         });
-        const items = (data as { items: Array<{ slug: string; name: string; volumeKg: number }> }).items;
+        const items = (
+          data as {
+            items: Array<{ slug: string; name: string; volumeKg: number }>;
+          }
+        ).items;
         return {
           chartType: input.chartType,
           unit: 'kg',
@@ -480,7 +512,9 @@ export class AnalyticsApplicationService {
       }
       case 'body_weight_over_time': {
         const fromUtc = parseDateKey(input.from);
-        const toUtc = new Date(parseDateKey(input.to).getTime() + 86_400_000 - 1);
+        const toUtc = new Date(
+          parseDateKey(input.to).getTime() + 86_400_000 - 1,
+        );
         const rows = await this.analytics.listBodyWeightKg(
           input.userId,
           fromUtc,
@@ -517,9 +551,7 @@ export class AnalyticsApplicationService {
     );
     const workouts = (
       await this.analytics.findCompletedWorkoutsAround(userId, fromUtc, toUtc)
-    ).filter(
-      (w) => dateKeyInTimeZone(w.completedAt, timeZone) === dateKey,
-    );
+    ).filter((w) => dateKeyInTimeZone(w.completedAt, timeZone) === dateKey);
 
     let totalVolumeKg = 0;
     let totalDurationSec = 0;
@@ -569,8 +601,7 @@ export class AnalyticsApplicationService {
         }
         const links = musclesByExercise.get(exercise.exerciseId) ?? [];
         for (const link of links) {
-          const factor =
-            link.role === 'PRIMARY' ? 1 : SECONDARY_MUSCLE_FACTOR;
+          const factor = link.role === 'PRIMARY' ? 1 : SECONDARY_MUSCLE_FACTOR;
           const current = muscleAgg.get(link.muscleGroupId) ?? {
             volumeKg: 0,
             setCount: 0,
@@ -676,8 +707,7 @@ export class AnalyticsApplicationService {
           if (set.weightKg !== null && set.reps !== null) {
             const e1rm = estimated1RmKg(set.weightKg, set.reps);
             if (e1rm !== null) {
-              bestE1rm =
-                bestE1rm === null ? e1rm : Math.max(bestE1rm, e1rm);
+              bestE1rm = bestE1rm === null ? e1rm : Math.max(bestE1rm, e1rm);
             }
           }
         }
@@ -742,8 +772,7 @@ export class AnalyticsApplicationService {
       );
     }
     const span =
-      (parseDateKey(to).getTime() - parseDateKey(from).getTime()) /
-      86_400_000;
+      (parseDateKey(to).getTime() - parseDateKey(from).getTime()) / 86_400_000;
     if (span > 366) {
       throw new BusinessError(
         'Date range cannot exceed 366 days',

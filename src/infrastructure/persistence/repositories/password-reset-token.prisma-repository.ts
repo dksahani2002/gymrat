@@ -26,7 +26,9 @@ export class PasswordResetTokenPrismaRepository implements PasswordResetTokenRep
     };
   }
 
-  async findValidByHash(tokenHash: string): Promise<PasswordResetTokenRecord | null> {
+  async findValidByHash(
+    tokenHash: string,
+  ): Promise<PasswordResetTokenRecord | null> {
     const row = await this.prisma.passwordResetToken.findFirst({
       where: {
         tokenHash,

@@ -1,4 +1,8 @@
-import { Workout, WorkoutExerciseProps, WorkoutSetProps } from '../workout/workout.entity';
+import {
+  Workout,
+  WorkoutExerciseProps,
+  WorkoutSetProps,
+} from '../workout/workout.entity';
 import { estimated1RmKg } from '../../shared/utils/epley.utils';
 import { PrType } from './pr-type.enum';
 
@@ -91,7 +95,9 @@ function candidatesForExercise(exercise: WorkoutExerciseProps): PrCandidate[] {
  * Derive PR candidates from a completed workout (working sets only).
  */
 export function detectPrCandidates(workout: Workout): PrCandidate[] {
-  return workout.exercises.flatMap((exercise) => candidatesForExercise(exercise));
+  return workout.exercises.flatMap((exercise) =>
+    candidatesForExercise(exercise),
+  );
 }
 
 /**

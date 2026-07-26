@@ -174,7 +174,10 @@ export class GoalsApplicationService {
           : null;
     this.assertDates(startsAt, targetDate);
 
-    if (input.status === GoalStatus.COMPLETED && existing.status !== GoalStatus.COMPLETED) {
+    if (
+      input.status === GoalStatus.COMPLETED &&
+      existing.status !== GoalStatus.COMPLETED
+    ) {
       return this.complete(input.userId, input.goalId, input.context);
     }
 
@@ -186,8 +189,7 @@ export class GoalsApplicationService {
       startsAt: input.startsAt ? startsAt : undefined,
       targetDate: input.targetDate === undefined ? undefined : targetDate,
       status: input.status,
-      completedAt:
-        input.status === GoalStatus.ABANDONED ? null : undefined,
+      completedAt: input.status === GoalStatus.ABANDONED ? null : undefined,
     });
 
     await this.audit.record({
@@ -300,10 +302,7 @@ export class GoalsApplicationService {
       case GoalType.BODY_WEIGHT: {
         unit = unit ?? 'KG';
         current = await this.goals.latestBodyWeightKg(goal.userId);
-        baseline = await this.goals.bodyWeightNear(
-          goal.userId,
-          goal.startsAt,
-        );
+        baseline = await this.goals.bodyWeightNear(goal.userId, goal.startsAt);
         break;
       }
       case GoalType.FREQUENCY: {

@@ -34,7 +34,10 @@ export class AuditLogService implements AuditLogPort {
         },
       });
     } catch (error) {
-      this.logger.error('Failed to write audit log', error instanceof Error ? error.stack : error);
+      this.logger.error(
+        'Failed to write audit log',
+        error instanceof Error ? error.stack : error,
+      );
     }
   }
 }

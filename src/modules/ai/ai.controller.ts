@@ -92,6 +92,13 @@ export class AiController {
     @Body('unitHint') unitHint?: 'KG' | 'LB',
     @Body('locale') locale?: string,
   ) {
+    if (!this.config.get<boolean>('features.voiceParse', true)) {
+      throw new BusinessError(
+        'Voice parse is disabled',
+        ErrorCodes.BUSINESS_ERROR,
+        503,
+      );
+    }
     if (!file) {
       throw new BusinessError(
         'audio file is required',
@@ -146,6 +153,13 @@ export class AiController {
   @ApiOperation({ summary: 'OCR workout parsing (stub)' })
   @ApiResponse({ status: 501, description: 'Not implemented' })
   parseImage() {
+    if (!this.config.get<boolean>('features.imageParse', false)) {
+      throw new BusinessError(
+        'Image parse is disabled',
+        ErrorCodes.BUSINESS_ERROR,
+        503,
+      );
+    }
     return this.ai.parseImage();
   }
 

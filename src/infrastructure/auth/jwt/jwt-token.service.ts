@@ -33,8 +33,14 @@ export class JwtTokenService implements TokenService {
 
   async issueTokenPair(input: IssueTokenPairInput): Promise<TokenPair> {
     const jti = randomUUID();
-    const accessExpiresIn = this.configService.get<string>('auth.accessExpiresIn', '15m');
-    const refreshExpiresDays = this.configService.get<number>('auth.refreshExpiresDays', 30);
+    const accessExpiresIn = this.configService.get<string>(
+      'auth.accessExpiresIn',
+      '15m',
+    );
+    const refreshExpiresDays = this.configService.get<number>(
+      'auth.refreshExpiresDays',
+      30,
+    );
     const familyId = input.familyId ?? randomUUID();
 
     const accessToken = await this.jwtService.signAsync(

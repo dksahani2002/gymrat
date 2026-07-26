@@ -58,7 +58,11 @@ export class AuthenticationError extends BaseError {
 }
 
 export class ConflictError extends BusinessError {
-  constructor(message: string, code: ErrorCode = ErrorCodes.CONFLICT, details?: unknown) {
+  constructor(
+    message: string,
+    code: ErrorCode = ErrorCodes.CONFLICT,
+    details?: unknown,
+  ) {
     super(message, code, HttpStatus.CONFLICT, details);
   }
 }

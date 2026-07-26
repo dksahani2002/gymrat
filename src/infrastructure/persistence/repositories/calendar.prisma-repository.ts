@@ -8,7 +8,10 @@ import {
   CreatePlannedWorkoutInput,
   UpdatePlannedWorkoutInput,
 } from '../../../domain/calendar/repositories/calendar.repository';
-import { NotFoundError, RepositoryError } from '../../../shared/errors/base.error';
+import {
+  NotFoundError,
+  RepositoryError,
+} from '../../../shared/errors/base.error';
 import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()

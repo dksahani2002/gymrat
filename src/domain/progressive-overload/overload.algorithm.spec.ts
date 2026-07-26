@@ -55,9 +55,7 @@ describe('computeOverloadRecommendation', () => {
 
   it('uses double progression for strength goals', () => {
     const result = computeOverloadRecommendation({
-      sessions: [
-        session('2026-07-20T12:00:00Z', [{ weightKg: 100, reps: 3 }]),
-      ],
+      sessions: [session('2026-07-20T12:00:00Z', [{ weightKg: 100, reps: 3 }])],
       equipmentSlug: 'barbell',
       goal: 'STRENGTH',
       now: new Date('2026-07-21T12:00:00Z'),
@@ -69,9 +67,7 @@ describe('computeOverloadRecommendation', () => {
 
   it('adds weight and resets reps at top of strength range', () => {
     const result = computeOverloadRecommendation({
-      sessions: [
-        session('2026-07-20T12:00:00Z', [{ weightKg: 100, reps: 5 }]),
-      ],
+      sessions: [session('2026-07-20T12:00:00Z', [{ weightKg: 100, reps: 5 }])],
       equipmentSlug: 'barbell',
       goal: 'STRENGTH',
       now: new Date('2026-07-21T12:00:00Z'),
@@ -124,9 +120,7 @@ describe('computeOverloadRecommendation', () => {
 
   it('applies detrain adjustment after long layoff', () => {
     const result = computeOverloadRecommendation({
-      sessions: [
-        session('2026-06-01T12:00:00Z', [{ weightKg: 100, reps: 5 }]),
-      ],
+      sessions: [session('2026-06-01T12:00:00Z', [{ weightKg: 100, reps: 5 }])],
       equipmentSlug: 'barbell',
       goal: 'BUILD_MUSCLE',
       now: new Date('2026-07-01T12:00:00Z'),
@@ -140,5 +134,60 @@ describe('computeOverloadRecommendation', () => {
     expect(roundToIncrement(81.2, 2.5)).toBe(80);
     expect(roundToIncrement(81.3, 2.5)).toBe(82.5);
     expect(roundToIncrement(81, 2)).toBe(82);
+    expect(roundToIncrement(81.25, 0)).toBe(81.25);
+  });
+
+  it('suggests bodyweight progression and endurance targets', () => {
+    const bw = computeOverloadRecommendation({
+      sessions: [
+        session('2026-07-20T12:00:00Z', [
+          { weightKg: null, reps: 10 },
+          { weightKg: null, reps: 10 },
+        ]),
+      ],
+      equipmentSlug: 'bodyweight',
+      goal: 'BUILD_MUSCLE',
+      now: new Date('2026-07-21T12:00:00Z'),
+    });
+    expect(bw.suggestion?.weightKg).toBeNull();
+    expect((bw.suggestion?.reps ?? 0) > 10).toBe(true);
+
+    const endurance = computeOverloadRecommendation({
+      sessions: [session('2026-07-20T12:00:00Z', [{ weightKg: 40, reps: 15 }])],
+      equipmentSlug: 'dumbbell',
+      goal: 'ENDURANCE',
+      now: new Date('2026-07-21T12:00:00Z'),
+    });
+    expect(endurance.suggestion?.reps).toBeGreaterThanOrEqual(12);
+  });
+
+  it('classifies mixed sessions and high-RPE hits', () => {
+    const mixed = computeOverloadRecommendation({
+      sessions: [
+        session('2026-07-20T12:00:00Z', [
+          { weightKg: 80, reps: 3 },
+          { weightKg: 80, reps: 8 },
+        ]),
+      ],
+      equipmentSlug: 'barbell',
+      goal: 'BUILD_MUSCLE',
+      now: new Date('2026-07-21T12:00:00Z'),
+    });
+    expect(['MIXED', 'UNDERPERFORM', 'OVERPERFORM', 'SUCCESS']).toContain(
+      mixed.classification,
+    );
+
+    const highRpe = computeOverloadRecommendation({
+      sessions: [
+        session('2026-07-20T12:00:00Z', [
+          { weightKg: 80, reps: 5, rpe: 9.5 },
+          { weightKg: 80, reps: 5, rpe: 9 },
+        ]),
+      ],
+      equipmentSlug: 'barbell',
+      goal: 'BUILD_MUSCLE',
+      now: new Date('2026-07-21T12:00:00Z'),
+    });
+    expect(['MARGINAL_SUCCESS', 'SUCCESS']).toContain(highRpe.classification);
   });
 });

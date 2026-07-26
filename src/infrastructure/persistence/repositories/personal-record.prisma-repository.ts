@@ -96,7 +96,7 @@ export class PersonalRecordPrismaRepository implements PersonalRecordRepository 
     const page = hasMore ? rows.slice(0, filters.limit) : rows;
     return {
       items: page.map((row) => this.toDomain(row)),
-      nextCursor: hasMore ? page[page.length - 1]?.id ?? null : null,
+      nextCursor: hasMore ? (page[page.length - 1]?.id ?? null) : null,
     };
   }
 

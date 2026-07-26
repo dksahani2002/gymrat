@@ -5,7 +5,10 @@ import { PrismaClient } from '@prisma/client';
  * Nest-managed Prisma client lifecycle wrapper.
  */
 @Injectable()
-export class PrismaService extends PrismaClient implements OnModuleInit, OnModuleDestroy {
+export class PrismaService
+  extends PrismaClient
+  implements OnModuleInit, OnModuleDestroy
+{
   async onModuleInit(): Promise<void> {
     await this.$connect();
   }

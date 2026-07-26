@@ -18,10 +18,7 @@ import type {
 } from '../../domain/workout/repositories/workout.repository';
 import { EVENT_BUS } from '../../shared/events/event-bus.port';
 import type { EventBusPort } from '../../shared/events/event-bus.port';
-import {
-  BusinessError,
-  NotFoundError,
-} from '../../shared/errors/base.error';
+import { BusinessError, NotFoundError } from '../../shared/errors/base.error';
 import { ErrorCodes } from '../../shared/errors/error-codes';
 import {
   CreateWorkoutCommand,
@@ -64,7 +61,11 @@ export class WorkoutApplicationService {
       ? new Date(command.startedAt)
       : new Date();
     if (Number.isNaN(startedAt.getTime())) {
-      throw new BusinessError('Invalid startedAt', ErrorCodes.VALIDATION_ERROR, 400);
+      throw new BusinessError(
+        'Invalid startedAt',
+        ErrorCodes.VALIDATION_ERROR,
+        400,
+      );
     }
 
     const shouldComplete = command.completed === true;
@@ -74,7 +75,10 @@ export class WorkoutApplicationService {
 
     const completedAt = shouldComplete ? new Date() : null;
     const durationSec = shouldComplete
-      ? Math.max(0, Math.floor((completedAt!.getTime() - startedAt.getTime()) / 1000))
+      ? Math.max(
+          0,
+          Math.floor((completedAt!.getTime() - startedAt.getTime()) / 1000),
+        )
       : null;
 
     const workout = await this.workouts.create({
@@ -82,7 +86,9 @@ export class WorkoutApplicationService {
       title: command.title?.trim() || null,
       notes: command.notes?.trim() || null,
       source: command.source ?? WorkoutSource.MANUAL,
-      status: shouldComplete ? WorkoutStatus.COMPLETED : WorkoutStatus.IN_PROGRESS,
+      status: shouldComplete
+        ? WorkoutStatus.COMPLETED
+        : WorkoutStatus.IN_PROGRESS,
       startedAt,
       completedAt,
       durationSec,
@@ -107,7 +113,10 @@ export class WorkoutApplicationService {
       action: 'workout.create',
       resourceType: 'workout',
       resourceId: workout.id,
-      afterJson: { status: workout.status, exerciseCount: workout.exercises.length },
+      afterJson: {
+        status: workout.status,
+        exerciseCount: workout.exercises.length,
+      },
       ip: command.context.ip,
       userAgent: command.context.userAgent,
       requestId: command.context.requestId,
@@ -143,11 +152,21 @@ export class WorkoutApplicationService {
   async update(command: UpdateWorkoutCommand): Promise<WorkoutView> {
     await this.requireOwned(command.workoutId, command.userId);
 
-    let workout = await this.workouts.updateMeta(command.workoutId, command.userId, {
-      title: command.title === undefined ? undefined : command.title?.trim() || null,
-      notes: command.notes === undefined ? undefined : command.notes?.trim() || null,
-      startedAt: command.startedAt ? new Date(command.startedAt) : undefined,
-    });
+    let workout = await this.workouts.updateMeta(
+      command.workoutId,
+      command.userId,
+      {
+        title:
+          command.title === undefined
+            ? undefined
+            : command.title?.trim() || null,
+        notes:
+          command.notes === undefined
+            ? undefined
+            : command.notes?.trim() || null,
+        startedAt: command.startedAt ? new Date(command.startedAt) : undefined,
+      },
+    );
 
     if (command.exercises) {
       this.assertExercises(command.exercises);
@@ -350,7 +369,12 @@ export class WorkoutApplicationService {
     context: RequestContext,
   ): Promise<WorkoutView> {
     await this.requireOwned(workoutId, userId);
-    const workout = await this.workouts.updateSet(workoutId, setId, userId, input);
+    const workout = await this.workouts.updateSet(
+      workoutId,
+      setId,
+      userId,
+      input,
+    );
     await this.audit.record({
       actorId: userId,
       action: 'workout.set_update',
@@ -383,7 +407,10 @@ export class WorkoutApplicationService {
     return this.toView(workout);
   }
 
-  private async requireOwned(workoutId: string, userId: string): Promise<Workout> {
+  private async requireOwned(
+    workoutId: string,
+    userId: string,
+  ): Promise<Workout> {
     const workout = await this.workouts.findByIdForUser(workoutId, userId);
     if (!workout || workout.deletedAt) {
       throw new NotFoundError('Workout not found');
@@ -432,10 +459,18 @@ export class WorkoutApplicationService {
       }
       numbers.add(set.setNumber);
       if (set.reps !== undefined && set.reps !== null && set.reps < 0) {
-        throw new BusinessError('reps must be >= 0', ErrorCodes.VALIDATION_ERROR, 400);
+        throw new BusinessError(
+          'reps must be >= 0',
+          ErrorCodes.VALIDATION_ERROR,
+          400,
+        );
       }
       if (set.weight !== undefined && set.weight !== null && set.weight < 0) {
-        throw new BusinessError('weight must be >= 0', ErrorCodes.VALIDATION_ERROR, 400);
+        throw new BusinessError(
+          'weight must be >= 0',
+          ErrorCodes.VALIDATION_ERROR,
+          400,
+        );
       }
     }
   }

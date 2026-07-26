@@ -44,7 +44,9 @@ export class GlobalExceptionFilter implements ExceptionFilter {
         exception instanceof Error ? exception.stack : undefined,
       );
     } else {
-      this.logger.warn(`${request.method} ${request.url} → ${status} ${body.error.code}`);
+      this.logger.warn(
+        `${request.method} ${request.url} → ${status} ${body.error.code}`,
+      );
     }
 
     response.status(status).json(body);

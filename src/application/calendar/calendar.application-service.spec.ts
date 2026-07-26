@@ -19,10 +19,7 @@ describe('CalendarApplicationService', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    service = new CalendarApplicationService(
-      calendar as never,
-      audit as never,
-    );
+    service = new CalendarApplicationService(calendar as never, audit as never);
   });
 
   it('merges completed and planned into day buckets', async () => {

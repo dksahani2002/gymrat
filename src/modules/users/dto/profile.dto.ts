@@ -27,7 +27,10 @@ export class UpdateProfileDto {
   @MaxLength(100)
   displayName?: string | null;
 
-  @ApiPropertyOptional({ example: '1995-06-15', description: 'ISO date YYYY-MM-DD' })
+  @ApiPropertyOptional({
+    example: '1995-06-15',
+    description: 'ISO date YYYY-MM-DD',
+  })
   @IsOptional()
   @IsDateString()
   dateOfBirth?: string | null;

@@ -43,8 +43,5 @@ export interface PersonalRecordRepository {
    * Current best (max value) per exercise+type for a user.
    * Optional exerciseIds filter for detection hot path.
    */
-  findBests(
-    userId: string,
-    exerciseIds?: string[],
-  ): Promise<PersonalRecord[]>;
+  findBests(userId: string, exerciseIds?: string[]): Promise<PersonalRecord[]>;
 }

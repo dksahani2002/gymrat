@@ -32,7 +32,10 @@ export class UsersController {
 
   @Get('me')
   @ApiOperation({ summary: 'Get the authenticated user profile' })
-  @ApiResponse({ status: 200, description: 'Full profile including derived age' })
+  @ApiResponse({
+    status: 200,
+    description: 'Full profile including derived age',
+  })
   async getMe(@CurrentUser() user: AuthenticatedUser) {
     return this.profileService.getMe(user.id);
   }

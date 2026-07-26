@@ -9,7 +9,10 @@ import {
   ListGoalsResult,
   UpdateGoalInput,
 } from '../../../domain/goal/repositories/goal.repository';
-import { NotFoundError, RepositoryError } from '../../../shared/errors/base.error';
+import {
+  NotFoundError,
+  RepositoryError,
+} from '../../../shared/errors/base.error';
 import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
@@ -79,7 +82,7 @@ export class GoalPrismaRepository implements GoalRepository {
     const page = hasMore ? rows.slice(0, filters.limit) : rows;
     return {
       items: page.map((row) => this.toDomain(row)),
-      nextCursor: hasMore ? page[page.length - 1]?.id ?? null : null,
+      nextCursor: hasMore ? (page[page.length - 1]?.id ?? null) : null,
     };
   }
 
@@ -208,7 +211,9 @@ export class GoalPrismaRepository implements GoalRepository {
     from: Date,
     to?: Date | null,
   ): Promise<number> {
-    const fromDate = new Date(from.toISOString().slice(0, 10) + 'T00:00:00.000Z');
+    const fromDate = new Date(
+      from.toISOString().slice(0, 10) + 'T00:00:00.000Z',
+    );
     const toDate = to
       ? new Date(to.toISOString().slice(0, 10) + 'T00:00:00.000Z')
       : undefined;

@@ -7,7 +7,10 @@ export default () => ({
   auth: {
     accessSecret: process.env.JWT_ACCESS_SECRET,
     accessExpiresIn: process.env.JWT_ACCESS_EXPIRES_IN ?? '15m',
-    refreshExpiresDays: parseInt(process.env.JWT_REFRESH_EXPIRES_DAYS ?? '30', 10),
+    refreshExpiresDays: parseInt(
+      process.env.JWT_REFRESH_EXPIRES_DAYS ?? '30',
+      10,
+    ),
     googleClientIds: (process.env.GOOGLE_CLIENT_IDS ?? '')
       .split(',')
       .map((id) => id.trim())
@@ -29,16 +32,35 @@ export default () => ({
     openaiApiKey: process.env.OPENAI_API_KEY ?? '',
     openaiModel: process.env.OPENAI_MODEL ?? 'gpt-4o-mini',
     voiceStorageDir: process.env.VOICE_STORAGE_DIR ?? './storage/voice',
-    maxVoiceBytes: parseInt(process.env.MAX_VOICE_BYTES ?? String(25 * 1024 * 1024), 10),
+    maxVoiceBytes: parseInt(
+      process.env.MAX_VOICE_BYTES ?? String(25 * 1024 * 1024),
+      10,
+    ),
   },
   overload: {
-    lookbackSessions: parseInt(process.env.OVERLOAD_LOOKBACK_SESSIONS ?? '3', 10),
-    barbellIncrementKg: parseFloat(process.env.OVERLOAD_BARBELL_INCREMENT_KG ?? '2.5'),
-    dumbbellIncrementKg: parseFloat(process.env.OVERLOAD_DUMBBELL_INCREMENT_KG ?? '2'),
-    deloadConsecutiveFails: parseInt(process.env.OVERLOAD_DELOAD_FAILS ?? '2', 10),
+    lookbackSessions: parseInt(
+      process.env.OVERLOAD_LOOKBACK_SESSIONS ?? '3',
+      10,
+    ),
+    barbellIncrementKg: parseFloat(
+      process.env.OVERLOAD_BARBELL_INCREMENT_KG ?? '2.5',
+    ),
+    dumbbellIncrementKg: parseFloat(
+      process.env.OVERLOAD_DUMBBELL_INCREMENT_KG ?? '2',
+    ),
+    deloadConsecutiveFails: parseInt(
+      process.env.OVERLOAD_DELOAD_FAILS ?? '2',
+      10,
+    ),
     deloadPercent: parseFloat(process.env.OVERLOAD_DELOAD_PERCENT ?? '0.10'),
     detrainDays: parseInt(process.env.OVERLOAD_DETRAIN_DAYS ?? '14', 10),
     recentDays: parseInt(process.env.OVERLOAD_RECENT_DAYS ?? '28', 10),
     cacheTtlSec: parseInt(process.env.OVERLOAD_CACHE_TTL_SEC ?? '900', 10),
+  },
+  features: {
+    softLaunch: process.env.FEATURE_SOFT_LAUNCH === 'true',
+    voiceParse: process.env.FEATURE_VOICE_PARSE !== 'false',
+    imageParse: process.env.FEATURE_IMAGE_PARSE === 'true',
+    googleAuth: process.env.FEATURE_GOOGLE_AUTH !== 'false',
   },
 });

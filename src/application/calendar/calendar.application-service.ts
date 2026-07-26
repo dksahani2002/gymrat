@@ -53,11 +53,7 @@ export class CalendarApplicationService {
     @Inject(AUDIT_LOG_PORT) private readonly audit: AuditLogPort,
   ) {}
 
-  async getRange(input: {
-    userId: string;
-    from: string;
-    to: string;
-  }): Promise<{
+  async getRange(input: { userId: string; from: string; to: string }): Promise<{
     from: string;
     to: string;
     timezone: string;
@@ -162,16 +158,12 @@ export class CalendarApplicationService {
 
     const updated = await this.calendar.updatePlanned(input.id, input.userId, {
       title:
-        input.title === undefined
-          ? undefined
-          : input.title?.trim() || null,
+        input.title === undefined ? undefined : input.title?.trim() || null,
       plannedDate: input.plannedDate
         ? this.normalizeDate(input.plannedDate)
         : undefined,
       notes:
-        input.notes === undefined
-          ? undefined
-          : input.notes?.trim() || null,
+        input.notes === undefined ? undefined : input.notes?.trim() || null,
     });
 
     await this.audit.record({
@@ -223,11 +215,7 @@ export class CalendarApplicationService {
     }
     const parsed = parseDateKey(key);
     if (Number.isNaN(parsed.getTime())) {
-      throw new BusinessError(
-        'Invalid date',
-        ErrorCodes.VALIDATION_ERROR,
-        400,
-      );
+      throw new BusinessError('Invalid date', ErrorCodes.VALIDATION_ERROR, 400);
     }
     return key;
   }
@@ -241,8 +229,7 @@ export class CalendarApplicationService {
       );
     }
     const span =
-      (parseDateKey(to).getTime() - parseDateKey(from).getTime()) /
-      86_400_000;
+      (parseDateKey(to).getTime() - parseDateKey(from).getTime()) / 86_400_000;
     if (span > 93) {
       throw new BusinessError(
         'Calendar range cannot exceed 93 days',

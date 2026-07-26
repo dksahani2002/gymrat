@@ -57,18 +57,11 @@ export interface GoalRepository {
   listActiveByUser(userId: string): Promise<Goal[]>;
   strengthBestKg(userId: string, exerciseId: string): Promise<number | null>;
   latestBodyWeightKg(userId: string): Promise<number | null>;
-  bodyWeightNear(
-    userId: string,
-    at: Date,
-  ): Promise<number | null>;
+  bodyWeightNear(userId: string, at: Date): Promise<number | null>;
   completedWorkoutCount(
     userId: string,
     from: Date,
     to?: Date | null,
   ): Promise<number>;
-  totalVolumeKg(
-    userId: string,
-    from: Date,
-    to?: Date | null,
-  ): Promise<number>;
+  totalVolumeKg(userId: string, from: Date, to?: Date | null): Promise<number>;
 }

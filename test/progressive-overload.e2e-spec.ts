@@ -97,7 +97,9 @@ describe('Progressive Overload (e2e)', () => {
 
   it('returns 404 for unknown exercise', async () => {
     await request(app.getHttpServer())
-      .get('/api/v1/recommendations/overload/00000000-0000-4000-8000-000000000099')
+      .get(
+        '/api/v1/recommendations/overload/00000000-0000-4000-8000-000000000099',
+      )
       .set('Authorization', `Bearer ${accessToken}`)
       .expect(404);
   });

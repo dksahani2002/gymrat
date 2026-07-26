@@ -34,7 +34,10 @@ export class AiParseLogPrismaRepository implements AiParseLogRepository {
     return this.toRecord(row);
   }
 
-  async listForUser(userId: string, limit: number): Promise<AiParseLogRecord[]> {
+  async listForUser(
+    userId: string,
+    limit: number,
+  ): Promise<AiParseLogRecord[]> {
     const rows = await this.prisma.aiParseLog.findMany({
       where: { userId },
       orderBy: { createdAt: 'desc' },

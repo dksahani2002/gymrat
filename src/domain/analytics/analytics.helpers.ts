@@ -48,7 +48,10 @@ export function computeStreak(
   return streak;
 }
 
-export function setVolumeKg(weightKg: number | null, reps: number | null): number {
+export function setVolumeKg(
+  weightKg: number | null,
+  reps: number | null,
+): number {
   if (weightKg === null || reps === null || reps <= 0 || weightKg < 0) {
     return 0;
   }

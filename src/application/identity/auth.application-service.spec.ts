@@ -4,7 +4,11 @@ import { Role, UserStatus } from '../../domain/identity/role.enum';
 import { User } from '../../domain/identity/user.entity';
 import { RefreshToken } from '../../domain/identity/refresh-token.entity';
 import { ErrorCodes } from '../../shared/errors/error-codes';
-import { AuthenticationError, BusinessError, ConflictError } from '../../shared/errors/base.error';
+import {
+  AuthenticationError,
+  BusinessError,
+  ConflictError,
+} from '../../shared/errors/base.error';
 
 describe('AuthApplicationService', () => {
   const context = { ip: '127.0.0.1', userAgent: 'jest', requestId: 'req-1' };
@@ -271,7 +275,10 @@ describe('AuthApplicationService', () => {
         context,
       });
 
-      expect(users.updatePasswordHash).toHaveBeenCalledWith('user-1', 'new-hash');
+      expect(users.updatePasswordHash).toHaveBeenCalledWith(
+        'user-1',
+        'new-hash',
+      );
       expect(refreshTokens.revokeAllForUser).toHaveBeenCalledWith('user-1');
       expect(passwordResetTokens.markUsed).toHaveBeenCalledWith('prt-1');
     });

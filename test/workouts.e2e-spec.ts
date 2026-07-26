@@ -98,9 +98,9 @@ describe('Workouts (e2e)', () => {
       .get('/api/v1/workouts')
       .set('Authorization', `Bearer ${accessToken}`)
       .expect(200);
-    expect(listed.body.data.items.some((w: { id: string }) => w.id === workoutId)).toBe(
-      true,
-    );
+    expect(
+      listed.body.data.items.some((w: { id: string }) => w.id === workoutId),
+    ).toBe(true);
 
     const completed = await request(app.getHttpServer())
       .post(`/api/v1/workouts/${workoutId}/complete`)
@@ -136,7 +136,10 @@ describe('Workouts (e2e)', () => {
       })
       .expect(201);
 
-    expect(created.body.data.exercises[0].sets[0].weightKg).toBeCloseTo(102.06, 1);
+    expect(created.body.data.exercises[0].sets[0].weightKg).toBeCloseTo(
+      102.06,
+      1,
+    );
     const workoutId = created.body.data.id as string;
     const workoutExerciseId = created.body.data.exercises[0].id as string;
 

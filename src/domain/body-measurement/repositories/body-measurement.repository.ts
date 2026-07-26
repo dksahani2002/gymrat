@@ -1,9 +1,8 @@
-import {
-  BodyMeasurement,
-  MeasurementMap,
-} from '../body-measurement.entity';
+import { BodyMeasurement, MeasurementMap } from '../body-measurement.entity';
 
-export const BODY_MEASUREMENT_REPOSITORY = Symbol('BODY_MEASUREMENT_REPOSITORY');
+export const BODY_MEASUREMENT_REPOSITORY = Symbol(
+  'BODY_MEASUREMENT_REPOSITORY',
+);
 
 export interface CreateBodyMeasurementInput {
   userId: string;
@@ -28,9 +27,6 @@ export interface ListBodyMeasurementResult {
 export interface BodyMeasurementRepository {
   create(input: CreateBodyMeasurementInput): Promise<BodyMeasurement>;
   list(filters: ListBodyMeasurementFilters): Promise<ListBodyMeasurementResult>;
-  findByIdForUser(
-    id: string,
-    userId: string,
-  ): Promise<BodyMeasurement | null>;
+  findByIdForUser(id: string, userId: string): Promise<BodyMeasurement | null>;
   softDelete(id: string, userId: string): Promise<void>;
 }

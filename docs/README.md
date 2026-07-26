@@ -32,6 +32,7 @@
 | — | [Goals Implementation](./phase-1/goals-implementation.md) | Goal CRUD + progress |
 | — | [Calendar Implementation](./phase-1/calendar-implementation.md) | Completed + planned days |
 | — | [Notifications Implementation](./phase-1/notifications-implementation.md) | Inbox, prefs, push tokens |
+| — | [M5/M6 Hardening](./phase-1/m5-m6-hardening.md) | CI, Docker staging, coverage, ops |
 | 10 | [Analytics Engine](./phase-1/10-analytics-engine.md) | Volume, PRs, charts, jobs |
 | 11 | [Progressive Overload](./phase-1/11-progressive-overload.md) | Algorithm & recommendation rules |
 | 12 | [Project Roadmap](./phase-1/12-roadmap.md) | Phased delivery |
@@ -39,6 +40,15 @@
 | 14 | [Milestones](./phase-1/14-milestones.md) | Exit criteria |
 | 15 | [Risks](./phase-1/15-risks.md) | Risk register |
 | 16 | [Estimated Timeline](./phase-1/16-timeline.md) | Effort & calendar |
+
+### Ops (M5 / M6)
+
+- [Security checklist](./ops/security-checklist.md)
+- [Deploy / rollback / recompute runbook](./ops/runbook.md)
+- [SLOs & error budget](./ops/slos.md)
+- [Secrets & backups](./ops/secrets-and-backups.md)
+- [On-call basics](./ops/on-call.md)
+- [Feature flags](./ops/feature-flags.md)
 
 ### Phase 2 — Intelligence Layer (Docs Only)
 

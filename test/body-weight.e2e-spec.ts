@@ -60,7 +60,11 @@ describe('Body Weight (e2e)', () => {
     await request(app.getHttpServer())
       .post('/api/v1/body-weight')
       .set('Authorization', `Bearer ${accessToken}`)
-      .send({ weight: 181.5, unit: 'LB', recordedAt: '2026-07-25T08:00:00.000Z' })
+      .send({
+        weight: 181.5,
+        unit: 'LB',
+        recordedAt: '2026-07-25T08:00:00.000Z',
+      })
       .expect(201);
 
     const listed = await request(app.getHttpServer())
@@ -78,9 +82,9 @@ describe('Body Weight (e2e)', () => {
 
     expect(chart.body.data.chartType).toBe('body_weight_over_time');
     expect(chart.body.data.points.length).toBeGreaterThanOrEqual(2);
-    expect(chart.body.data.points.some((p: { y: number }) => p.y === 82.5)).toBe(
-      true,
-    );
+    expect(
+      chart.body.data.points.some((p: { y: number }) => p.y === 82.5),
+    ).toBe(true);
 
     await request(app.getHttpServer())
       .delete(`/api/v1/body-weight/${id}`)

@@ -25,8 +25,10 @@
     "prisma:migrate": "prisma migrate dev",
     "prisma:deploy": "prisma migrate deploy",
     "prisma:seed": "ts-node --transpile-only prisma/seed/exercises.seed.ts",
+    "analytics:recompute": "ts-node --transpile-only scripts/recompute-analytics.ts",
     "docker:up": "docker compose up -d",
-    "docker:down": "docker compose down"
+    "docker:down": "docker compose down",
+    "docker:staging": "docker compose -f docker-compose.staging.yml --env-file .env.staging up -d --build"
   },
   "prisma": {
     "seed": "ts-node --transpile-only prisma/seed/exercises.seed.ts"
@@ -95,9 +97,24 @@
       "^.+\\.(t|j)s$": "ts-jest"
     },
     "collectCoverageFrom": [
-      "**/*.(t|j)s"
+      "domain/**/*.ts",
+      "application/**/*.ts",
+      "!**/*.spec.ts",
+      "!**/ports/**",
+      "!**/repositories/**",
+      "!**/commands/**",
+      "!**/*.enums.ts",
+      "!**/events/**"
     ],
     "coverageDirectory": "../coverage",
-    "testEnvironment": "node"
+    "testEnvironment": "node",
+    "coverageThreshold": {
+      "global": {
+        "statements": 80,
+        "lines": 80,
+        "functions": 65,
+        "branches": 45
+      }
+    }
   }
 }

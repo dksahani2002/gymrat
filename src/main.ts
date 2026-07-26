@@ -49,11 +49,14 @@ async function bootstrap(): Promise<void> {
       transformOptions: { enableImplicitConversion: true },
     }),
   );
+  app.enableShutdownHooks();
 
   if (nodeEnv !== 'production') {
     const swaggerConfig = new DocumentBuilder()
       .setTitle('GymRat API')
-      .setDescription('AI Fitness Platform — Phase 1 Auth, Profile, Exercises & Workouts')
+      .setDescription(
+        'AI Fitness Platform — Phase 1 MVP (auth, logging, analytics, goals, notifications)',
+      )
       .setVersion('0.1.0')
       .addBearerAuth()
       .build();
@@ -62,7 +65,10 @@ async function bootstrap(): Promise<void> {
   }
 
   await app.listen(port);
-  Logger.log(`API listening on http://localhost:${port}/${apiPrefix}`, 'Bootstrap');
+  Logger.log(
+    `API listening on http://localhost:${port}/${apiPrefix}`,
+    'Bootstrap',
+  );
   if (nodeEnv !== 'production') {
     Logger.log(`Swagger at http://localhost:${port}/docs`, 'Bootstrap');
   }

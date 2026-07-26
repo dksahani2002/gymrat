@@ -14,6 +14,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { Throttle } from '@nestjs/throttler';
+import { ConfigService } from '@nestjs/config';
 import { Request } from 'express';
 import { AuthApplicationService } from '../../application/identity/auth.application-service';
 import {
@@ -21,6 +22,8 @@ import {
   AuthenticatedUser,
 } from '../../shared/decorators/current-user.decorator';
 import { Public } from '../../shared/decorators/public.decorator';
+import { BusinessError } from '../../shared/errors/base.error';
+import { ErrorCodes } from '../../shared/errors/error-codes';
 import {
   ForgotPasswordDto,
   GoogleLoginDto,
@@ -36,7 +39,10 @@ type RequestWithMeta = Request & { requestId?: string };
 @ApiTags('auth')
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthApplicationService) {}
+  constructor(
+    private readonly authService: AuthApplicationService,
+    private readonly config: ConfigService,
+  ) {}
 
   @Public()
   @Post('register')
@@ -136,6 +142,13 @@ export class AuthController {
   @Throttle({ default: { limit: 10, ttl: 60000 } })
   @ApiOperation({ summary: 'Login or register with a Google ID token' })
   async google(@Body() dto: GoogleLoginDto, @Req() req: RequestWithMeta) {
+    if (!this.config.get<boolean>('features.googleAuth', true)) {
+      throw new BusinessError(
+        'Google auth is disabled',
+        ErrorCodes.BUSINESS_ERROR,
+        503,
+      );
+    }
     return this.authService.googleLogin({
       idToken: dto.idToken,
       context: this.contextFrom(req),

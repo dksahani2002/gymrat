@@ -19,7 +19,8 @@ export class RegisterDto {
 
   @ApiProperty({
     example: 'Str0ngPass!',
-    description: 'Min 8 chars, at least one upper, lower, digit, and special character',
+    description:
+      'Min 8 chars, at least one upper, lower, digit, and special character',
   })
   @IsString()
   @MinLength(8)

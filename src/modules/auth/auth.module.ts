@@ -45,7 +45,10 @@ import { JwtStrategy } from './strategies/jwt.strategy';
     AuthApplicationService,
     JwtStrategy,
     { provide: USER_REPOSITORY, useClass: UserPrismaRepository },
-    { provide: REFRESH_TOKEN_REPOSITORY, useClass: RefreshTokenPrismaRepository },
+    {
+      provide: REFRESH_TOKEN_REPOSITORY,
+      useClass: RefreshTokenPrismaRepository,
+    },
     {
       provide: PASSWORD_RESET_TOKEN_REPOSITORY,
       useClass: PasswordResetTokenPrismaRepository,

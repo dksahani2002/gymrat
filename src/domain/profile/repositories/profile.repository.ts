@@ -37,7 +37,10 @@ export interface UpdatePreferencesInput {
  */
 export interface ProfileRepository {
   findByUserId(userId: string): Promise<UserProfile | null>;
-  updateProfile(userId: string, input: UpdateProfileInput): Promise<UserProfile>;
+  updateProfile(
+    userId: string,
+    input: UpdateProfileInput,
+  ): Promise<UserProfile>;
   getPreferences(userId: string): Promise<UserPreferences | null>;
   updatePreferences(
     userId: string,

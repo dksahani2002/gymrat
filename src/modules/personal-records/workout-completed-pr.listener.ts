@@ -8,7 +8,9 @@ import { WorkoutCompletedEvent } from '../../domain/workout/events/workout.event
  */
 @Injectable()
 export class WorkoutCompletedPrListener {
-  constructor(private readonly personalRecords: PersonalRecordsApplicationService) {}
+  constructor(
+    private readonly personalRecords: PersonalRecordsApplicationService,
+  ) {}
 
   @OnEvent('workout.completed')
   async handle(event: WorkoutCompletedEvent): Promise<void> {
