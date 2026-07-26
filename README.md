@@ -108,6 +108,15 @@ Detected on `workout.completed`. See `docs/phase-1/personal-records-implementati
 
 See `docs/phase-1/analytics-implementation.md`.
 
+## Progressive overload endpoints
+
+| Method | Path | Auth |
+|--------|------|------|
+| GET | `/recommendations/overload` | Bearer |
+| GET | `/recommendations/overload/:exerciseId` | Bearer |
+
+See `docs/phase-1/progressive-overload-implementation.md`.
+
 ## Tests
 
 ```bash
