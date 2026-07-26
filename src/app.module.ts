@@ -19,6 +19,7 @@ import { RecommendationsModule } from './modules/recommendations/recommendations
 import { BodyWeightModule } from './modules/body-weight/body-weight.module';
 import { MeasurementsModule } from './modules/measurements/measurements.module';
 import { GoalsModule } from './modules/goals/goals.module';
+import { CalendarModule } from './modules/calendar/calendar.module';
 import { GlobalExceptionFilter } from './shared/filters/global-exception.filter';
 import { JwtAuthGuard } from './shared/guards/jwt-auth.guard';
 import { RolesGuard } from './shared/guards/roles.guard';
@@ -54,6 +55,7 @@ import { RequestIdMiddleware } from './shared/middleware/request-id.middleware';
     BodyWeightModule,
     MeasurementsModule,
     GoalsModule,
+    CalendarModule,
     AiModule,
     HealthModule,
   ],
