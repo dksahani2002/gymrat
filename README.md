@@ -34,6 +34,16 @@ npm run start:dev
 | POST | `/auth/google` | Public |
 | GET | `/auth/me` | Bearer |
 
+## Profile endpoints
+
+| Method | Path | Auth |
+|--------|------|------|
+| GET | `/users/me` | Bearer |
+| PATCH | `/users/me` | Bearer |
+| DELETE | `/users/me` | Bearer |
+| GET | `/users/me/preferences` | Bearer |
+| PATCH | `/users/me/preferences` | Bearer |
+
 ## Tests
 
 ```bash

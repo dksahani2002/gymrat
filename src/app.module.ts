@@ -9,6 +9,7 @@ import { RedisModule } from './infrastructure/cache/redis.module';
 import { PrismaModule } from './infrastructure/persistence/prisma/prisma.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { HealthModule } from './modules/health/health.module';
+import { UsersModule } from './modules/users/users.module';
 import { GlobalExceptionFilter } from './shared/filters/global-exception.filter';
 import { JwtAuthGuard } from './shared/guards/jwt-auth.guard';
 import { RolesGuard } from './shared/guards/roles.guard';
@@ -35,6 +36,7 @@ import { RequestIdMiddleware } from './shared/middleware/request-id.middleware';
     PrismaModule,
     RedisModule,
     AuthModule,
+    UsersModule,
     HealthModule,
   ],
   providers: [
