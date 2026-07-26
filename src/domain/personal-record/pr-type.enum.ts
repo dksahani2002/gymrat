@@ -1,0 +1,6 @@
+export enum PrType {
+  MAX_WEIGHT = 'MAX_WEIGHT',
+  MAX_REPS = 'MAX_REPS',
+  MAX_VOLUME = 'MAX_VOLUME',
+  ESTIMATED_1RM = 'ESTIMATED_1RM',
+}

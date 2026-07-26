@@ -6,7 +6,7 @@ import { EventBusPort } from '../../shared/events/event-bus.port';
 export class NestEventBus implements EventBusPort {
   constructor(private readonly emitter: EventEmitter2) {}
 
-  publish(eventName: string, payload: unknown): void {
-    this.emitter.emit(eventName, payload);
+  async publish(eventName: string, payload: unknown): Promise<void> {
+    await this.emitter.emitAsync(eventName, payload);
   }
 }

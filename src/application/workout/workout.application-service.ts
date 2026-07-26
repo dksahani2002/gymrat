@@ -99,7 +99,7 @@ export class WorkoutApplicationService {
     }
 
     if (shouldComplete) {
-      this.emitCompleted(workout);
+      await this.emitCompleted(workout);
     }
 
     await this.audit.record({
@@ -219,7 +219,7 @@ export class WorkoutApplicationService {
       completedAt,
       durationSec,
     );
-    this.emitCompleted(workout);
+    await this.emitCompleted(workout);
 
     await this.audit.record({
       actorId: userId,
@@ -488,13 +488,13 @@ export class WorkoutApplicationService {
     };
   }
 
-  private emitCompleted(workout: Workout): void {
+  private async emitCompleted(workout: Workout): Promise<void> {
     const event = new WorkoutCompletedEvent(
       workout.id,
       workout.userId,
       workout.completedAt ?? new Date(),
     );
-    this.events.publish(event.eventName, event);
+    await this.events.publish(event.eventName, event);
   }
 
   private toView(workout: Workout): WorkoutView {
