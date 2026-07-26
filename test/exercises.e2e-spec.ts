@@ -104,13 +104,14 @@ describe('Exercises (e2e)', () => {
       .expect(200);
     const muscleGroupId = muscles.body.data[0].id as string;
 
+    const suffix = Date.now();
     const created = await request(app.getHttpServer())
       .post('/api/v1/exercises')
       .set('Authorization', `Bearer ${accessToken}`)
       .send({
-        name: `Custom Fly ${Date.now()}`,
+        name: `Custom Fly ${suffix}`,
         categoryId,
-        aliases: ['my fly'],
+        aliases: [`my-fly-${suffix}`],
         muscles: [{ muscleGroupId, role: 'PRIMARY' }],
       })
       .expect(201);
