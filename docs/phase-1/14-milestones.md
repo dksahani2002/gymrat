@@ -47,6 +47,8 @@
 - Test coverage ≥ 80% on domain/application; critical e2e suite green
 - Runbook: deploy, rollback, recompute analytics
 
+**Status:** Implemented — see [`m5-m6-hardening.md`](./m5-m6-hardening.md) and [`docs/ops/`](../ops/).
+
 ## M6 — Production Readiness (Launch)
 
 **Exit**
@@ -54,3 +56,5 @@
 - Error budget / SLOs defined (availability, p95 latency)
 - On-call basics
 - Soft launch feature flags if needed
+
+**Status:** Implemented — ops docs + env feature flags; wire real alerting/backups in the target cloud before public launch.

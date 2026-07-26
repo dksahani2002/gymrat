@@ -15,7 +15,10 @@ import { UsersController } from './users.controller';
   providers: [
     ProfileApplicationService,
     { provide: PROFILE_REPOSITORY, useClass: ProfilePrismaRepository },
-    { provide: REFRESH_TOKEN_REPOSITORY, useClass: RefreshTokenPrismaRepository },
+    {
+      provide: REFRESH_TOKEN_REPOSITORY,
+      useClass: RefreshTokenPrismaRepository,
+    },
     { provide: AUDIT_LOG_PORT, useClass: AuditLogService },
     { provide: EVENT_BUS, useClass: NestEventBus },
   ],

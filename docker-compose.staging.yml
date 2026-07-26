@@ -1,0 +1,91 @@
+# Staging stack: Postgres + Redis + API (migrations via migrate service)
+# Usage:
+#   cp .env.example .env.staging  # then fill secrets
+#   docker compose -f docker-compose.staging.yml --env-file .env.staging up -d --build
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-gymrat}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-gymrat}
+      POSTGRES_DB: ${POSTGRES_DB:-gymrat}
+    volumes:
+      - gymrat_staging_pg:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    volumes:
+      - gymrat_staging_redis:/data
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  migrate:
+    build: .
+    restart: 'no'
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-gymrat}:${POSTGRES_PASSWORD:-gymrat}@postgres:5432/${POSTGRES_DB:-gymrat}?schema=public
+    entrypoint: ['npx', 'prisma', 'migrate', 'deploy']
+
+  api:
+    build: .
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+    ports:
+      - '${PORT:-3000}:3000'
+    environment:
+      NODE_ENV: staging
+      PORT: 3000
+      API_PREFIX: ${API_PREFIX:-api/v1}
+      DATABASE_URL: postgresql://${POSTGRES_USER:-gymrat}:${POSTGRES_PASSWORD:-gymrat}@postgres:5432/${POSTGRES_DB:-gymrat}?schema=public
+      REDIS_URL: redis://redis:6379
+      JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET}
+      JWT_ACCESS_EXPIRES_IN: ${JWT_ACCESS_EXPIRES_IN:-15m}
+      JWT_REFRESH_EXPIRES_DAYS: ${JWT_REFRESH_EXPIRES_DAYS:-30}
+      GOOGLE_CLIENT_IDS: ${GOOGLE_CLIENT_IDS}
+      APP_URL: ${APP_URL:-http://localhost:3000}
+      FRONTEND_URL: ${FRONTEND_URL:-http://localhost:5173}
+      MAIL_FROM: ${MAIL_FROM:-noreply@gymrat.local}
+      MAIL_LOG_RESET_TOKENS: 'false'
+      THROTTLE_TTL_MS: ${THROTTLE_TTL_MS:-60000}
+      THROTTLE_LIMIT: ${THROTTLE_LIMIT:-100}
+      AUTH_THROTTLE_LIMIT: ${AUTH_THROTTLE_LIMIT:-10}
+      FEATURE_SOFT_LAUNCH: ${FEATURE_SOFT_LAUNCH:-true}
+      FEATURE_VOICE_PARSE: ${FEATURE_VOICE_PARSE:-true}
+      FEATURE_IMAGE_PARSE: ${FEATURE_IMAGE_PARSE:-false}
+      FEATURE_GOOGLE_AUTH: ${FEATURE_GOOGLE_AUTH:-true}
+    healthcheck:
+      test:
+        [
+          'CMD',
+          'node',
+          '-e',
+          "fetch('http://127.0.0.1:3000/api/v1/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))",
+        ]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+volumes:
+  gymrat_staging_pg:
+  gymrat_staging_redis:

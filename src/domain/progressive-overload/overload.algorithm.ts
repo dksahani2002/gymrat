@@ -95,7 +95,10 @@ function topSet(sets: OverloadSet[]): OverloadSet | null {
   });
 }
 
-export function roundToIncrement(weightKg: number, incrementKg: number): number {
+export function roundToIncrement(
+  weightKg: number,
+  incrementKg: number,
+): number {
   if (incrementKg <= 0) {
     return Math.round(weightKg * 100) / 100;
   }
@@ -179,7 +182,9 @@ function consecutiveUnderperforms(
     const previous = sessionsNewestFirst[i + 1];
     const top = topSet(session.sets);
     if (!top || top.reps === null) break;
-    const target = previous ? (topSet(previous.sets)?.reps ?? top.reps) : top.reps;
+    const target = previous
+      ? (topSet(previous.sets)?.reps ?? top.reps)
+      : top.reps;
     const cls =
       !previous && !workingSets(session.sets).some((s) => s.isFailure)
         ? 'SUCCESS'
@@ -290,7 +295,11 @@ export function computeOverloadRecommendation(input: {
       nextReps = Math.min(baselineReps + 2, profile.repMax);
       nextWeight = baselineWeight;
       rationale = `Endurance bias: keep load and push reps toward ${profile.repMax}.`;
-      if (baselineReps >= profile.repMax && baselineWeight !== null && increment > 0) {
+      if (
+        baselineReps >= profile.repMax &&
+        baselineWeight !== null &&
+        increment > 0
+      ) {
         nextWeight = roundToIncrement(baselineWeight + increment, increment);
         nextReps = profile.repMin;
         rationale = `Endurance range topped out; adding ${increment}kg and resetting reps.`;
@@ -320,10 +329,7 @@ export function computeOverloadRecommendation(input: {
         'High RPE success — hold weight and nudge reps if under range top.';
     } else if (classification === 'UNDERPERFORM') {
       if (baselineWeight !== null && increment > 0) {
-        nextWeight = roundToIncrement(
-          baselineWeight * 0.975,
-          increment,
-        );
+        nextWeight = roundToIncrement(baselineWeight * 0.975, increment);
         rationale =
           'Underperformed; reducing load ~2.5% and holding rep target.';
       } else {
@@ -343,11 +349,7 @@ export function computeOverloadRecommendation(input: {
   }
 
   const confidence =
-    sessions.length >= 3
-      ? 0.9
-      : sessions.length === 2
-        ? 0.75
-        : 0.55;
+    sessions.length >= 3 ? 0.9 : sessions.length === 2 ? 0.75 : 0.55;
 
   return {
     classification,

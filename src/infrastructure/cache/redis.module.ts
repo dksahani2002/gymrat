@@ -1,4 +1,10 @@
-import { Global, Inject, Injectable, Module, OnModuleDestroy } from '@nestjs/common';
+import {
+  Global,
+  Inject,
+  Injectable,
+  Module,
+  OnModuleDestroy,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import Redis from 'ioredis';
 
@@ -20,7 +26,11 @@ export class RedisService implements OnModuleDestroy {
    * Sliding-window style limiter using Redis INCR + EXPIRE.
    * Returns true when the request is allowed.
    */
-  async hit(key: string, limit: number, windowSeconds: number): Promise<boolean> {
+  async hit(
+    key: string,
+    limit: number,
+    windowSeconds: number,
+  ): Promise<boolean> {
     const count = await this.client.incr(key);
     if (count === 1) {
       await this.client.expire(key, windowSeconds);

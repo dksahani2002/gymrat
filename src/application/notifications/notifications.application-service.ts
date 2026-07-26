@@ -1,7 +1,5 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
-import {
-  NotificationPreferences,
-} from '../../domain/notification/notification.entity';
+import { NotificationPreferences } from '../../domain/notification/notification.entity';
 import {
   NOTIFICATION_REPOSITORY,
   NotificationRepository,

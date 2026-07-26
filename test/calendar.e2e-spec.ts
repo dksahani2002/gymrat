@@ -98,9 +98,8 @@ describe('Calendar (e2e)', () => {
       ),
     ).toBe(true);
     expect(
-      calendar.body.data.days.some(
-        (day: { planned: Array<{ id: string }> }) =>
-          day.planned.some((p) => p.id === plannedId),
+      calendar.body.data.days.some((day: { planned: Array<{ id: string }> }) =>
+        day.planned.some((p) => p.id === plannedId),
       ),
     ).toBe(true);
 

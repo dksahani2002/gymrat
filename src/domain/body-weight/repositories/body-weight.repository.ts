@@ -29,9 +29,5 @@ export interface BodyWeightRepository {
   list(filters: ListBodyWeightFilters): Promise<ListBodyWeightResult>;
   findByIdForUser(id: string, userId: string): Promise<BodyWeightEntry | null>;
   softDelete(id: string, userId: string): Promise<void>;
-  listInRange(
-    userId: string,
-    from: Date,
-    to: Date,
-  ): Promise<BodyWeightEntry[]>;
+  listInRange(userId: string, from: Date, to: Date): Promise<BodyWeightEntry[]>;
 }

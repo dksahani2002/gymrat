@@ -119,7 +119,9 @@ export class WorkoutsController {
   }
 
   @Post(':id/complete')
-  @ApiOperation({ summary: 'Mark workout completed and emit workout.completed' })
+  @ApiOperation({
+    summary: 'Mark workout completed and emit workout.completed',
+  })
   async complete(
     @CurrentUser() user: AuthenticatedUser,
     @Param('id', ParseUUIDPipe) id: string,

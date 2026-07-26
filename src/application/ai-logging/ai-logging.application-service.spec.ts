@@ -64,7 +64,9 @@ describe('AiLoggingApplicationService', () => {
       text: 'Bench 80kg 5x5',
     });
 
-    expect(draft.workout.exercises[0].resolvedExercise?.name).toBe('Bench Press');
+    expect(draft.workout.exercises[0].resolvedExercise?.name).toBe(
+      'Bench Press',
+    );
     expect(draft.workout.exercises[0].sets).toHaveLength(2);
     expect(draft.confidence).toBeCloseTo(0.97);
     expect(logs.create).toHaveBeenCalledWith(
@@ -74,7 +76,9 @@ describe('AiLoggingApplicationService', () => {
 
   it('marks unknown exercises with warnings', async () => {
     parser.parse.mockResolvedValue({
-      exercises: [{ rawName: 'Unknown Lift', sets: [{ reps: 10, unit: 'KG' }] }],
+      exercises: [
+        { rawName: 'Unknown Lift', sets: [{ reps: 10, unit: 'KG' }] },
+      ],
       providerMeta: { provider: 'rules', model: 'rules-v1', latencyMs: 1 },
     });
     resolver.resolve.mockResolvedValue({

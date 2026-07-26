@@ -62,7 +62,11 @@ export interface WorkoutRepository {
   create(input: CreateWorkoutInput): Promise<Workout>;
   findByIdForUser(id: string, userId: string): Promise<Workout | null>;
   list(filters: ListWorkoutsFilters): Promise<ListWorkoutsResult>;
-  updateMeta(id: string, userId: string, input: UpdateWorkoutMetaInput): Promise<Workout>;
+  updateMeta(
+    id: string,
+    userId: string,
+    input: UpdateWorkoutMetaInput,
+  ): Promise<Workout>;
   replaceExercises(
     id: string,
     userId: string,

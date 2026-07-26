@@ -14,7 +14,10 @@ import { WorkoutCompletedPrListener } from './workout-completed-pr.listener';
   providers: [
     PersonalRecordsApplicationService,
     WorkoutCompletedPrListener,
-    { provide: PERSONAL_RECORD_REPOSITORY, useClass: PersonalRecordPrismaRepository },
+    {
+      provide: PERSONAL_RECORD_REPOSITORY,
+      useClass: PersonalRecordPrismaRepository,
+    },
     { provide: WORKOUT_REPOSITORY, useClass: WorkoutPrismaRepository },
     { provide: EVENT_BUS, useClass: NestEventBus },
   ],

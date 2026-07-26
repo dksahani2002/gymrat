@@ -16,7 +16,9 @@ import { ListPersonalRecordsQueryDto } from './dto/personal-record.dto';
 @ApiBearerAuth()
 @Controller('personal-records')
 export class PersonalRecordsController {
-  constructor(private readonly personalRecords: PersonalRecordsApplicationService) {}
+  constructor(
+    private readonly personalRecords: PersonalRecordsApplicationService,
+  ) {}
 
   @Get()
   @ApiOperation({ summary: 'List personal records (filters + cursor)' })

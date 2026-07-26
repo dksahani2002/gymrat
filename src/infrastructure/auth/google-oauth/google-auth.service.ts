@@ -17,7 +17,10 @@ export class GoogleAuthService implements GoogleAuthPort {
   private readonly audiences: string[];
 
   constructor(private readonly configService: ConfigService) {
-    this.audiences = this.configService.get<string[]>('auth.googleClientIds', []);
+    this.audiences = this.configService.get<string[]>(
+      'auth.googleClientIds',
+      [],
+    );
     this.client = new OAuth2Client();
   }
 
@@ -36,7 +39,10 @@ export class GoogleAuthService implements GoogleAuthPort {
       });
       const payload = ticket.getPayload();
       if (!payload?.sub || !payload.email) {
-        throw new AuthenticationError('Invalid Google token payload', ErrorCodes.INVALID_TOKEN);
+        throw new AuthenticationError(
+          'Invalid Google token payload',
+          ErrorCodes.INVALID_TOKEN,
+        );
       }
 
       return {
@@ -49,7 +55,11 @@ export class GoogleAuthService implements GoogleAuthPort {
       if (error instanceof AuthenticationError) {
         throw error;
       }
-      throw new AuthenticationError('Invalid Google ID token', ErrorCodes.INVALID_TOKEN, error);
+      throw new AuthenticationError(
+        'Invalid Google ID token',
+        ErrorCodes.INVALID_TOKEN,
+        error,
+      );
     }
   }
 }

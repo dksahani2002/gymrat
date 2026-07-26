@@ -1,5 +1,9 @@
 import { Workout } from '../workout/workout.entity';
-import { WeightUnit, WorkoutSource, WorkoutStatus } from '../workout/workout.enums';
+import {
+  WeightUnit,
+  WorkoutSource,
+  WorkoutStatus,
+} from '../workout/workout.enums';
 import {
   detectPrCandidates,
   estimated1RmKg,
@@ -69,9 +73,7 @@ describe('pr-detection', () => {
     ]);
 
     const candidates = detectPrCandidates(workout);
-    const byType = Object.fromEntries(
-      candidates.map((c) => [c.type, c.value]),
-    );
+    const byType = Object.fromEntries(candidates.map((c) => [c.type, c.value]));
 
     expect(byType[PrType.MAX_WEIGHT]).toBe(85);
     expect(byType[PrType.MAX_REPS]).toBe(5);

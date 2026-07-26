@@ -16,7 +16,10 @@ export class LocalObjectStorage implements ObjectStoragePort {
     body: Buffer;
     contentType: string;
   }): Promise<{ key: string }> {
-    const root = this.config.get<string>('ai.voiceStorageDir', './storage/voice');
+    const root = this.config.get<string>(
+      'ai.voiceStorageDir',
+      './storage/voice',
+    );
     const fullPath = join(root, input.key);
     await mkdir(dirname(fullPath), { recursive: true });
     await writeFile(fullPath, input.body);

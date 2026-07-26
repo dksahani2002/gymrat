@@ -66,8 +66,17 @@ export class PrismaExerciseResolver implements ExerciseResolverPort {
         isCustom: false,
         OR: [
           { name: { contains: normalized, mode: 'insensitive' } },
-          { aliases: { some: { alias: { contains: normalized, mode: 'insensitive' } } } },
-          { slug: { contains: normalized.replace(/\s+/g, '-'), mode: 'insensitive' } },
+          {
+            aliases: {
+              some: { alias: { contains: normalized, mode: 'insensitive' } },
+            },
+          },
+          {
+            slug: {
+              contains: normalized.replace(/\s+/g, '-'),
+              mode: 'insensitive',
+            },
+          },
         ],
       },
       take: 5,

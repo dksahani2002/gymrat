@@ -16,7 +16,10 @@ import {
   WorkoutRepository,
   WorkoutSetInput,
 } from '../../../domain/workout/repositories/workout.repository';
-import { NotFoundError, RepositoryError } from '../../../shared/errors/base.error';
+import {
+  NotFoundError,
+  RepositoryError,
+} from '../../../shared/errors/base.error';
 import { toWeightKg } from '../../../shared/utils/unit-conversion.utils';
 import { PrismaService } from '../prisma/prisma.service';
 import { WorkoutMapper } from '../prisma/mappers/workout.mapper';
@@ -112,7 +115,10 @@ export class WorkoutPrismaRepository implements WorkoutRepository {
     const page = rows.slice(0, filters.limit);
     return {
       items: page.map((row) => WorkoutMapper.toDomain(row)),
-      nextCursor: rows.length > filters.limit ? page[page.length - 1]?.id ?? null : null,
+      nextCursor:
+        rows.length > filters.limit
+          ? (page[page.length - 1]?.id ?? null)
+          : null,
     };
   }
 
@@ -127,7 +133,9 @@ export class WorkoutPrismaRepository implements WorkoutRepository {
       data: {
         ...(input.title !== undefined ? { title: input.title } : {}),
         ...(input.notes !== undefined ? { notes: input.notes } : {}),
-        ...(input.startedAt !== undefined ? { startedAt: input.startedAt } : {}),
+        ...(input.startedAt !== undefined
+          ? { startedAt: input.startedAt }
+          : {}),
       },
       include: workoutInclude,
     });
@@ -241,7 +249,9 @@ export class WorkoutPrismaRepository implements WorkoutRepository {
     if (!existing) {
       throw new NotFoundError('Workout exercise not found');
     }
-    await this.prisma.workoutExercise.delete({ where: { id: workoutExerciseId } });
+    await this.prisma.workoutExercise.delete({
+      where: { id: workoutExerciseId },
+    });
     return (await this.findByIdForUser(workoutId, userId))!;
   }
 
@@ -292,7 +302,9 @@ export class WorkoutPrismaRepository implements WorkoutRepository {
     await this.prisma.workoutSet.update({
       where: { id: setId },
       data: {
-        ...(input.setNumber !== undefined ? { setNumber: input.setNumber } : {}),
+        ...(input.setNumber !== undefined
+          ? { setNumber: input.setNumber }
+          : {}),
         ...(input.reps !== undefined ? { reps: input.reps } : {}),
         ...(input.weight !== undefined ? { weight: input.weight } : {}),
         ...(input.weightUnit !== undefined
@@ -303,10 +315,16 @@ export class WorkoutPrismaRepository implements WorkoutRepository {
             ? null
             : toWeightKg(weight, weightUnit),
         ...(input.rpe !== undefined ? { rpe: input.rpe } : {}),
-        ...(input.durationSec !== undefined ? { durationSec: input.durationSec } : {}),
-        ...(input.distanceM !== undefined ? { distanceM: input.distanceM } : {}),
+        ...(input.durationSec !== undefined
+          ? { durationSec: input.durationSec }
+          : {}),
+        ...(input.distanceM !== undefined
+          ? { distanceM: input.distanceM }
+          : {}),
         ...(input.isWarmup !== undefined ? { isWarmup: input.isWarmup } : {}),
-        ...(input.isFailure !== undefined ? { isFailure: input.isFailure } : {}),
+        ...(input.isFailure !== undefined
+          ? { isFailure: input.isFailure }
+          : {}),
         ...(input.notes !== undefined ? { notes: input.notes } : {}),
       },
     });
@@ -329,11 +347,18 @@ export class WorkoutPrismaRepository implements WorkoutRepository {
     return (await this.findByIdForUser(workoutId, userId))!;
   }
 
-  async findByIdempotencyKey(userId: string, key: string): Promise<Workout | null> {
+  async findByIdempotencyKey(
+    userId: string,
+    key: string,
+  ): Promise<Workout | null> {
     const record = await this.prisma.workoutIdempotencyKey.findUnique({
       where: { userId_key: { userId, key } },
     });
-    if (!record || record.expiresAt.getTime() < Date.now() || !record.workoutId) {
+    if (
+      !record ||
+      record.expiresAt.getTime() < Date.now() ||
+      !record.workoutId
+    ) {
       return null;
     }
     return this.findByIdForUser(record.workoutId, userId);

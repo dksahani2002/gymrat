@@ -1,4 +1,8 @@
-import { WeightUnit, WorkoutSource, WorkoutStatus } from '../../../domain/workout/workout.enums';
+import {
+  WeightUnit,
+  WorkoutSource,
+  WorkoutStatus,
+} from '../../../domain/workout/workout.enums';
 
 export interface RequestContext {
   ip?: string | null;

@@ -1,4 +1,8 @@
-import { Role as PrismaRole, User as PrismaUser, UserStatus as PrismaStatus } from '@prisma/client';
+import {
+  Role as PrismaRole,
+  User as PrismaUser,
+  UserStatus as PrismaStatus,
+} from '@prisma/client';
 import { Role, UserStatus } from '../../../../domain/identity/role.enum';
 import { User } from '../../../../domain/identity/user.entity';
 

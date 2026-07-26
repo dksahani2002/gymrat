@@ -111,7 +111,8 @@ export class CreateExerciseDto {
   muscles?: ExerciseMuscleInputDto[];
 
   @ApiPropertyOptional({
-    description: 'Force custom (user-owned) exercise. Non-admins always create custom.',
+    description:
+      'Force custom (user-owned) exercise. Non-admins always create custom.',
   })
   @IsOptional()
   @IsBoolean()

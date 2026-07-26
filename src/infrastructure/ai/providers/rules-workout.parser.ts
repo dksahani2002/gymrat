@@ -64,7 +64,9 @@ export class RulesWorkoutParser implements AiWorkoutParserPort {
       .normalize('NFKC')
       .replace(/\u00d7/g, 'x')
       .replace(/(\d)\s*(kgs?|lbs?)\b/gi, (_, digit: string, unit: string) => {
-        const normalizedUnit = unit.toLowerCase().startsWith('lb') ? 'lb' : 'kg';
+        const normalizedUnit = unit.toLowerCase().startsWith('lb')
+          ? 'lb'
+          : 'kg';
         return `${digit} ${normalizedUnit}`;
       })
       .replace(/\bkgs\b/gi, 'kg')
@@ -138,9 +140,7 @@ export class RulesWorkoutParser implements AiWorkoutParserPort {
     }
 
     // Pattern: Name bodyweight 8,8,6
-    const bwList = segment.match(
-      /^(.+?)\s+bodyweight\s+([\d,\s]+)\s*$/i,
-    );
+    const bwList = segment.match(/^(.+?)\s+bodyweight\s+([\d,\s]+)\s*$/i);
     if (bwList) {
       const repsList = bwList[2]
         .split(/[,\s]+/)
@@ -205,7 +205,10 @@ export class RulesWorkoutParser implements AiWorkoutParserPort {
     return Array.from({ length: safe }, () => ({ ...template }));
   }
 
-  private unitFrom(raw: string | undefined, hint: WeightUnitHint): WeightUnitHint {
+  private unitFrom(
+    raw: string | undefined,
+    hint: WeightUnitHint,
+  ): WeightUnitHint {
     if (!raw) return hint;
     return raw.toLowerCase().startsWith('lb') ? 'LB' : 'KG';
   }

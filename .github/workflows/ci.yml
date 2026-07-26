@@ -1,0 +1,77 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master, develop]
+  pull_request:
+
+env:
+  NODE_ENV: test
+  PORT: 3000
+  API_PREFIX: api/v1
+  DATABASE_URL: postgresql://gymrat:gymrat@localhost:5432/gymrat?schema=public
+  REDIS_URL: redis://localhost:6379
+  JWT_ACCESS_SECRET: ci-access-secret-change-me-min-32-chars!!
+  JWT_ACCESS_EXPIRES_IN: 15m
+  JWT_REFRESH_EXPIRES_DAYS: 30
+  GOOGLE_CLIENT_IDS: ci-google-client-id.apps.googleusercontent.com
+  APP_URL: http://localhost:3000
+  FRONTEND_URL: http://localhost:5173
+  MAIL_FROM: noreply@gymrat.local
+  MAIL_LOG_RESET_TOKENS: 'false'
+  THROTTLE_TTL_MS: 60000
+  THROTTLE_LIMIT: 100
+  AUTH_THROTTLE_LIMIT: 10
+
+jobs:
+  unit:
+    name: Lint & unit tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+      - run: npm ci
+      - run: npx prisma generate
+      - run: npm run lint
+      - run: npm run test:cov
+      - run: npm run build
+
+  e2e:
+    name: E2E tests
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: gymrat
+          POSTGRES_PASSWORD: gymrat
+          POSTGRES_DB: gymrat
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U gymrat -d gymrat"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+      - run: npm ci
+      - run: npx prisma migrate deploy
+      - run: npm run prisma:seed
+      - run: npm run test:e2e

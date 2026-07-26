@@ -52,7 +52,8 @@ import {
 export class AuthApplicationService {
   constructor(
     @Inject(USER_REPOSITORY) private readonly users: UserRepository,
-    @Inject(REFRESH_TOKEN_REPOSITORY) private readonly refreshTokens: RefreshTokenRepository,
+    @Inject(REFRESH_TOKEN_REPOSITORY)
+    private readonly refreshTokens: RefreshTokenRepository,
     @Inject(PASSWORD_RESET_TOKEN_REPOSITORY)
     private readonly passwordResetTokens: PasswordResetTokenRepository,
     @Inject(PASSWORD_HASHER) private readonly passwordHasher: PasswordHasher,
@@ -68,7 +69,10 @@ export class AuthApplicationService {
     const email = command.email.trim().toLowerCase();
     const existing = await this.users.findByEmail(email);
     if (existing) {
-      throw new ConflictError('Email is already registered', ErrorCodes.EMAIL_TAKEN);
+      throw new ConflictError(
+        'Email is already registered',
+        ErrorCodes.EMAIL_TAKEN,
+      );
     }
 
     const passwordHash = await this.passwordHasher.hash(command.password);
@@ -111,7 +115,10 @@ export class AuthApplicationService {
     const dummyHash =
       '$argon2id$v=19$m=19456,t=2,p=1$AAAAAAAAAAAAAAAAAAAAAA$AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
     const hashToVerify = user?.passwordHash ?? dummyHash;
-    const passwordValid = await this.passwordHasher.verify(hashToVerify, command.password);
+    const passwordValid = await this.passwordHasher.verify(
+      hashToVerify,
+      command.password,
+    );
 
     if (!user || !user.passwordHash || !passwordValid) {
       await this.audit.record({
@@ -124,7 +131,10 @@ export class AuthApplicationService {
         requestId: command.context.requestId,
         afterJson: { email },
       });
-      throw new AuthenticationError('Invalid email or password', ErrorCodes.INVALID_CREDENTIALS);
+      throw new AuthenticationError(
+        'Invalid email or password',
+        ErrorCodes.INVALID_CREDENTIALS,
+      );
     }
 
     this.assertUserCanAuthenticate(user);
@@ -159,12 +169,18 @@ export class AuthApplicationService {
     const existing = await this.refreshTokens.findByTokenHash(tokenHash);
 
     if (!existing) {
-      throw new AuthenticationError('Invalid refresh token', ErrorCodes.INVALID_TOKEN);
+      throw new AuthenticationError(
+        'Invalid refresh token',
+        ErrorCodes.INVALID_TOKEN,
+      );
     }
 
     if (existing.isRevoked) {
       await this.refreshTokens.revokeFamily(existing.familyId);
-      const reuse = new RefreshTokenReuseDetectedEvent(existing.userId, existing.familyId);
+      const reuse = new RefreshTokenReuseDetectedEvent(
+        existing.userId,
+        existing.familyId,
+      );
       this.events.publish(reuse.eventName, reuse);
       await this.audit.record({
         actorId: existing.userId,
@@ -182,12 +198,18 @@ export class AuthApplicationService {
     }
 
     if (existing.isExpired) {
-      throw new AuthenticationError('Refresh token expired', ErrorCodes.INVALID_TOKEN);
+      throw new AuthenticationError(
+        'Refresh token expired',
+        ErrorCodes.INVALID_TOKEN,
+      );
     }
 
     const user = await this.users.findById(existing.userId);
     if (!user) {
-      throw new AuthenticationError('Invalid refresh token', ErrorCodes.INVALID_TOKEN);
+      throw new AuthenticationError(
+        'Invalid refresh token',
+        ErrorCodes.INVALID_TOKEN,
+      );
     }
     this.assertUserCanAuthenticate(user);
 
@@ -247,7 +269,11 @@ export class AuthApplicationService {
         expiresAt,
       );
 
-      const event = new PasswordResetRequestedEvent(user.id, user.email, rawToken);
+      const event = new PasswordResetRequestedEvent(
+        user.id,
+        user.email,
+        rawToken,
+      );
       this.events.publish(event.eventName, event);
       await this.mail.sendPasswordReset(user.email, rawToken);
 
@@ -267,12 +293,18 @@ export class AuthApplicationService {
     const tokenHash = this.tokenService.hashToken(command.token);
     const record = await this.passwordResetTokens.findValidByHash(tokenHash);
     if (!record) {
-      throw new AuthenticationError('Invalid or expired reset token', ErrorCodes.INVALID_TOKEN);
+      throw new AuthenticationError(
+        'Invalid or expired reset token',
+        ErrorCodes.INVALID_TOKEN,
+      );
     }
 
     const user = await this.users.findById(record.userId);
     if (!user) {
-      throw new AuthenticationError('Invalid or expired reset token', ErrorCodes.INVALID_TOKEN);
+      throw new AuthenticationError(
+        'Invalid or expired reset token',
+        ErrorCodes.INVALID_TOKEN,
+      );
     }
 
     const passwordHash = await this.passwordHasher.hash(command.newPassword);
@@ -352,14 +384,23 @@ export class AuthApplicationService {
 
   private assertUserCanAuthenticate(user: User): void {
     if (user.status === UserStatus.SUSPENDED) {
-      throw new AuthenticationError('Account is suspended', ErrorCodes.ACCOUNT_SUSPENDED);
+      throw new AuthenticationError(
+        'Account is suspended',
+        ErrorCodes.ACCOUNT_SUSPENDED,
+      );
     }
     if (user.status === UserStatus.DELETED || user.deletedAt !== null) {
-      throw new AuthenticationError('Account is deleted', ErrorCodes.ACCOUNT_DELETED);
+      throw new AuthenticationError(
+        'Account is deleted',
+        ErrorCodes.ACCOUNT_DELETED,
+      );
     }
   }
 
-  private async assertLoginNotRateLimited(email: string, ip?: string | null): Promise<void> {
+  private async assertLoginNotRateLimited(
+    email: string,
+    ip?: string | null,
+  ): Promise<void> {
     const windowSeconds = 60;
     const limit = 10;
     const keys = [

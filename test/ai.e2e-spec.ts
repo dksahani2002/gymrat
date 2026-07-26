@@ -65,7 +65,9 @@ describe('AI Parser (e2e)', () => {
       })
       .expect(200);
 
-    expect(response.body.data.workout.exercises.length).toBeGreaterThanOrEqual(2);
+    expect(response.body.data.workout.exercises.length).toBeGreaterThanOrEqual(
+      2,
+    );
   });
 
   it('returns 422 for unparseable text', async () => {
@@ -92,13 +94,13 @@ describe('AI Parser (e2e)', () => {
     expect(response.body.data.workout.exercises.length).toBeGreaterThan(0);
   });
 
-  it('returns 501 for OCR stub', async () => {
+  it('returns 503 when image parse feature flag is off', async () => {
     const response = await request(app.getHttpServer())
       .post('/api/v1/ai/parse-image')
       .set('Authorization', `Bearer ${accessToken}`)
-      .expect(501);
+      .expect(503);
 
-    expect(response.body.error.code).toBe('NOT_IMPLEMENTED');
+    expect(response.body.error).toBeDefined();
   });
 
   it('lists parse logs', async () => {

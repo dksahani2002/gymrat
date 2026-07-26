@@ -1,6 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { MuscleRole as PrismaMuscleRole, Prisma } from '@prisma/client';
-import { Exercise, NamedSlugRef } from '../../../domain/exercise/exercise.entity';
+import {
+  Exercise,
+  NamedSlugRef,
+} from '../../../domain/exercise/exercise.entity';
 import {
   CreateExerciseInput,
   ExerciseRepository,
@@ -8,7 +11,10 @@ import {
   ExerciseSearchResult,
   UpdateExerciseInput,
 } from '../../../domain/exercise/repositories/exercise.repository';
-import { ConflictError, RepositoryError } from '../../../shared/errors/base.error';
+import {
+  ConflictError,
+  RepositoryError,
+} from '../../../shared/errors/base.error';
 import { ErrorCodes } from '../../../shared/errors/error-codes';
 import { PrismaService } from '../prisma/prisma.service';
 import { ExerciseMapper } from '../prisma/mappers/exercise.mapper';
@@ -53,17 +59,29 @@ export class ExercisePrismaRepository implements ExerciseRepository {
     if (filters.muscleGroupId) {
       where.muscles = { some: { muscleGroupId: filters.muscleGroupId } };
     } else if (filters.muscleGroupSlug) {
-      where.muscles = { some: { muscleGroup: { slug: filters.muscleGroupSlug } } };
+      where.muscles = {
+        some: { muscleGroup: { slug: filters.muscleGroupSlug } },
+      };
     }
 
     if (filters.q) {
       const q = filters.q.trim();
       where.AND = [
-        ...(Array.isArray(where.AND) ? where.AND : where.AND ? [where.AND] : []),
+        ...(Array.isArray(where.AND)
+          ? where.AND
+          : where.AND
+            ? [where.AND]
+            : []),
         {
           OR: [
             { name: { contains: q, mode: 'insensitive' } },
-            { aliases: { some: { alias: { contains: q.toLowerCase(), mode: 'insensitive' } } } },
+            {
+              aliases: {
+                some: {
+                  alias: { contains: q.toLowerCase(), mode: 'insensitive' },
+                },
+              },
+            },
             { slug: { contains: q.toLowerCase(), mode: 'insensitive' } },
           ],
         },
@@ -77,7 +95,11 @@ export class ExercisePrismaRepository implements ExerciseRepository {
       });
       if (cursorRow) {
         where.AND = [
-          ...(Array.isArray(where.AND) ? where.AND : where.AND ? [where.AND] : []),
+          ...(Array.isArray(where.AND)
+            ? where.AND
+            : where.AND
+              ? [where.AND]
+              : []),
           {
             OR: [
               { name: { gt: cursorRow.name } },
@@ -96,7 +118,8 @@ export class ExercisePrismaRepository implements ExerciseRepository {
     });
 
     const page = rows.slice(0, filters.limit);
-    const nextCursor = rows.length > filters.limit ? page[page.length - 1]?.id ?? null : null;
+    const nextCursor =
+      rows.length > filters.limit ? (page[page.length - 1]?.id ?? null) : null;
 
     return {
       items: page.map((row) => ExerciseMapper.toDomain(row)),
@@ -151,7 +174,10 @@ export class ExercisePrismaRepository implements ExerciseRepository {
         error instanceof Prisma.PrismaClientKnownRequestError &&
         error.code === 'P2002'
       ) {
-        throw new ConflictError('Alias or slug already exists', ErrorCodes.CONFLICT);
+        throw new ConflictError(
+          'Alias or slug already exists',
+          ErrorCodes.CONFLICT,
+        );
       }
       throw new RepositoryError('Failed to create exercise', error);
     }
@@ -169,7 +195,8 @@ export class ExercisePrismaRepository implements ExerciseRepository {
             .replace(/[^a-z0-9]+/g, '-')
             .replace(/^-|-$/g, '');
         }
-        if (input.description !== undefined) data.description = input.description;
+        if (input.description !== undefined)
+          data.description = input.description;
         if (input.categoryId !== undefined) {
           data.category = input.categoryId
             ? { connect: { id: input.categoryId } }
@@ -220,7 +247,10 @@ export class ExercisePrismaRepository implements ExerciseRepository {
         error instanceof Prisma.PrismaClientKnownRequestError &&
         error.code === 'P2002'
       ) {
-        throw new ConflictError('Alias or slug already exists', ErrorCodes.CONFLICT);
+        throw new ConflictError(
+          'Alias or slug already exists',
+          ErrorCodes.CONFLICT,
+        );
       }
       throw new RepositoryError('Failed to update exercise', error);
     }
@@ -263,7 +293,9 @@ export class ExercisePrismaRepository implements ExerciseRepository {
   }
 
   async findCategoryIdBySlug(slug: string): Promise<string | null> {
-    const row = await this.prisma.exerciseCategory.findUnique({ where: { slug } });
+    const row = await this.prisma.exerciseCategory.findUnique({
+      where: { slug },
+    });
     return row?.id ?? null;
   }
 

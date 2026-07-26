@@ -79,11 +79,7 @@ export class BodyMeasurementApplicationService {
 
     await this.events.publish(
       'body_measurement.logged',
-      new BodyMeasurementLoggedEvent(
-        entry.id,
-        entry.userId,
-        entry.recordedAt,
-      ),
+      new BodyMeasurementLoggedEvent(entry.id, entry.userId, entry.recordedAt),
     );
 
     await this.audit.record({

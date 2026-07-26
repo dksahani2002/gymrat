@@ -14,7 +14,10 @@ export class LoggingMailService implements MailPort {
   async sendPasswordReset(email: string, resetToken: string): Promise<void> {
     const frontendUrl = this.configService.get<string>('frontendUrl');
     const resetUrl = `${frontendUrl}/reset-password?token=${encodeURIComponent(resetToken)}`;
-    const logTokens = this.configService.get<boolean>('mail.logResetTokens', false);
+    const logTokens = this.configService.get<boolean>(
+      'mail.logResetTokens',
+      false,
+    );
 
     this.logger.log(`Password reset email queued for ${email}`);
     if (logTokens) {
@@ -23,6 +26,8 @@ export class LoggingMailService implements MailPort {
   }
 
   async sendWelcome(email: string, displayName?: string | null): Promise<void> {
-    this.logger.log(`Welcome email queued for ${email}${displayName ? ` (${displayName})` : ''}`);
+    this.logger.log(
+      `Welcome email queued for ${email}${displayName ? ` (${displayName})` : ''}`,
+    );
   }
 }

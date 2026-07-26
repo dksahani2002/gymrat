@@ -16,10 +16,7 @@ import {
   UserPreferences,
   UserProfile,
 } from '../../../domain/profile/user-profile.entity';
-import {
-  HeightUnit,
-  WeightUnit,
-} from '../../../domain/profile/profile.enums';
+import { HeightUnit, WeightUnit } from '../../../domain/profile/profile.enums';
 import { RepositoryError } from '../../../shared/errors/base.error';
 import { PrismaService } from '../prisma/prisma.service';
 import { ProfileMapper } from '../prisma/mappers/profile.mapper';
@@ -49,7 +46,10 @@ export class ProfilePrismaRepository implements ProfileRepository {
     return row ? ProfileMapper.toDomain(row) : null;
   }
 
-  async updateProfile(userId: string, input: UpdateProfileInput): Promise<UserProfile> {
+  async updateProfile(
+    userId: string,
+    input: UpdateProfileInput,
+  ): Promise<UserProfile> {
     try {
       const data: {
         displayName?: string | null;
@@ -65,7 +65,8 @@ export class ProfilePrismaRepository implements ProfileRepository {
 
       if (input.displayName !== undefined) data.displayName = input.displayName;
       if (input.dateOfBirth !== undefined) data.dateOfBirth = input.dateOfBirth;
-      if (input.gender !== undefined) data.gender = input.gender as PrismaGender | null;
+      if (input.gender !== undefined)
+        data.gender = input.gender as PrismaGender | null;
       if (input.heightValue !== undefined) data.heightValue = input.heightValue;
       if (input.heightUnit !== undefined) {
         data.heightUnit = input.heightUnit as PrismaHeightUnit;
@@ -77,7 +78,8 @@ export class ProfilePrismaRepository implements ProfileRepository {
         data.activityLevel = input.activityLevel as PrismaActivityLevel | null;
       }
       if (input.preferredWeightUnit !== undefined) {
-        data.preferredWeightUnit = input.preferredWeightUnit as PrismaWeightUnit;
+        data.preferredWeightUnit =
+          input.preferredWeightUnit as PrismaWeightUnit;
       }
       if (input.timezone !== undefined) data.timezone = input.timezone;
 

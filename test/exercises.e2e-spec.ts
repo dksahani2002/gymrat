@@ -86,9 +86,7 @@ describe('Exercises (e2e)', () => {
 
     expect(detail.body.data.name).toBe('Bench Press');
     expect(detail.body.data.muscles.length).toBeGreaterThan(0);
-    expect(detail.body.data.aliases).toEqual(
-      expect.arrayContaining(['bench']),
-    );
+    expect(detail.body.data.aliases).toEqual(expect.arrayContaining(['bench']));
   });
 
   it('creates, updates, and soft-deletes a custom exercise', async () => {

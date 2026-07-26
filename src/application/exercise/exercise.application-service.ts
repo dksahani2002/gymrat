@@ -66,16 +66,15 @@ export class ExerciseApplicationService {
     if (!exercise || exercise.deletedAt) {
       throw new NotFoundError('Exercise not found');
     }
-    if (
-      exercise.isCustom &&
-      exercise.createdById !== actorUserId
-    ) {
+    if (exercise.isCustom && exercise.createdById !== actorUserId) {
       throw new NotFoundError('Exercise not found');
     }
     return this.toView(exercise);
   }
 
-  async listCategories(): Promise<Array<{ id: string; slug: string; name: string }>> {
+  async listCategories(): Promise<
+    Array<{ id: string; slug: string; name: string }>
+  > {
     return this.cachedList('categories', () => this.exercises.listCategories());
   }
 
@@ -85,7 +84,9 @@ export class ExerciseApplicationService {
     return this.cachedList('muscles', () => this.exercises.listMuscleGroups());
   }
 
-  async listEquipment(): Promise<Array<{ id: string; slug: string; name: string }>> {
+  async listEquipment(): Promise<
+    Array<{ id: string; slug: string; name: string }>
+  > {
     return this.cachedList('equipment', () => this.exercises.listEquipment());
   }
 
@@ -97,12 +98,19 @@ export class ExerciseApplicationService {
       throw new AuthorizationError('Only admins can create global exercises');
     }
 
-    await this.assertRefs(command.categoryId, command.equipmentId, command.muscles);
+    await this.assertRefs(
+      command.categoryId,
+      command.equipmentId,
+      command.muscles,
+    );
 
     const slug = this.slugify(command.name);
     const existing = await this.exercises.findBySlug(slug);
     if (existing && !existing.deletedAt) {
-      throw new ConflictError('An exercise with this name already exists', ErrorCodes.CONFLICT);
+      throw new ConflictError(
+        'An exercise with this name already exists',
+        ErrorCodes.CONFLICT,
+      );
     }
 
     const created = await this.exercises.create({
@@ -141,18 +149,26 @@ export class ExerciseApplicationService {
     }
 
     const isAdmin = command.actorRole === Role.ADMIN;
-    const isOwner = existing.isCustom && existing.createdById === command.actorUserId;
+    const isOwner =
+      existing.isCustom && existing.createdById === command.actorUserId;
     if (!isAdmin && !isOwner) {
       throw new AuthorizationError('You cannot update this exercise');
     }
 
-    await this.assertRefs(command.categoryId, command.equipmentId, command.muscles);
+    await this.assertRefs(
+      command.categoryId,
+      command.equipmentId,
+      command.muscles,
+    );
 
     if (command.name) {
       const slug = this.slugify(command.name);
       const clash = await this.exercises.findBySlug(slug);
       if (clash && clash.id !== existing.id && !clash.deletedAt) {
-        throw new ConflictError('An exercise with this name already exists', ErrorCodes.CONFLICT);
+        throw new ConflictError(
+          'An exercise with this name already exists',
+          ErrorCodes.CONFLICT,
+        );
       }
     }
 
@@ -197,7 +213,8 @@ export class ExerciseApplicationService {
     }
 
     const isAdmin = command.actorRole === Role.ADMIN;
-    const isOwner = existing.isCustom && existing.createdById === command.actorUserId;
+    const isOwner =
+      existing.isCustom && existing.createdById === command.actorUserId;
     if (!isAdmin && !isOwner) {
       throw new AuthorizationError('You cannot delete this exercise');
     }
@@ -226,20 +243,32 @@ export class ExerciseApplicationService {
     if (categoryId) {
       const cats = await this.exercises.listCategories();
       if (!cats.some((c) => c.id === categoryId)) {
-        throw new BusinessError('Invalid categoryId', ErrorCodes.VALIDATION_ERROR, 400);
+        throw new BusinessError(
+          'Invalid categoryId',
+          ErrorCodes.VALIDATION_ERROR,
+          400,
+        );
       }
     }
     if (equipmentId) {
       const equipment = await this.exercises.listEquipment();
       if (!equipment.some((e) => e.id === equipmentId)) {
-        throw new BusinessError('Invalid equipmentId', ErrorCodes.VALIDATION_ERROR, 400);
+        throw new BusinessError(
+          'Invalid equipmentId',
+          ErrorCodes.VALIDATION_ERROR,
+          400,
+        );
       }
     }
     if (muscles && muscles.length > 0) {
       const ids = [...new Set(muscles.map((m) => m.muscleGroupId))];
       const ok = await this.exercises.muscleGroupsExist(ids);
       if (!ok) {
-        throw new BusinessError('Invalid muscleGroupId', ErrorCodes.VALIDATION_ERROR, 400);
+        throw new BusinessError(
+          'Invalid muscleGroupId',
+          ErrorCodes.VALIDATION_ERROR,
+          400,
+        );
       }
     }
   }
@@ -264,7 +293,11 @@ export class ExerciseApplicationService {
       .replace(/[^a-z0-9]+/g, '-')
       .replace(/^-|-$/g, '');
     if (!slug) {
-      throw new BusinessError('Invalid exercise name', ErrorCodes.VALIDATION_ERROR, 400);
+      throw new BusinessError(
+        'Invalid exercise name',
+        ErrorCodes.VALIDATION_ERROR,
+        400,
+      );
     }
     return slug;
   }
@@ -312,7 +345,12 @@ export class ExerciseApplicationService {
       return JSON.parse(cached) as T;
     }
     const data = await loader();
-    await this.redis.raw.set(cacheKey, JSON.stringify(data), 'EX', CACHE_TTL_SECONDS);
+    await this.redis.raw.set(
+      cacheKey,
+      JSON.stringify(data),
+      'EX',
+      CACHE_TTL_SECONDS,
+    );
     return data;
   }
 

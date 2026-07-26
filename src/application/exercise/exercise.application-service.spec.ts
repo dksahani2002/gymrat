@@ -2,7 +2,11 @@ import { ExerciseApplicationService } from './exercise.application-service';
 import { Exercise } from '../../domain/exercise/exercise.entity';
 import { MuscleRole } from '../../domain/exercise/exercise.enums';
 import { Role } from '../../domain/identity/role.enum';
-import { AuthorizationError, ConflictError, NotFoundError } from '../../shared/errors/base.error';
+import {
+  AuthorizationError,
+  ConflictError,
+  NotFoundError,
+} from '../../shared/errors/base.error';
 
 describe('ExerciseApplicationService', () => {
   const context = { ip: '127.0.0.1', userAgent: 'jest', requestId: 'req-1' };
@@ -160,9 +164,7 @@ describe('ExerciseApplicationService', () => {
   });
 
   it('caches category lists', async () => {
-    redis.raw.get
-      .mockResolvedValueOnce('2')
-      .mockResolvedValueOnce(null);
+    redis.raw.get.mockResolvedValueOnce('2').mockResolvedValueOnce(null);
     exercises.listCategories.mockResolvedValue([
       { id: 'cat-1', slug: 'push', name: 'Push' },
     ]);
@@ -170,5 +172,46 @@ describe('ExerciseApplicationService', () => {
     const result = await service.listCategories();
     expect(result[0].slug).toBe('push');
     expect(redis.raw.set).toHaveBeenCalled();
+  });
+
+  it('returns cached taxonomy lists and allows admin updates', async () => {
+    redis.raw.get.mockResolvedValue(
+      JSON.stringify([{ id: 'm-1', slug: 'chest', name: 'Chest' }]),
+    );
+    const muscles = await service.listMuscles();
+    expect(muscles[0].slug).toBe('chest');
+    expect(exercises.listMuscleGroups).not.toHaveBeenCalled();
+
+    redis.raw.get.mockResolvedValue(
+      JSON.stringify([{ id: 'eq-1', slug: 'barbell', name: 'Barbell' }]),
+    );
+    const equipment = await service.listEquipment();
+    expect(equipment[0].slug).toBe('barbell');
+
+    exercises.findById.mockResolvedValue(sample);
+    exercises.update.mockResolvedValue(
+      Exercise.create({ ...sample, name: 'Bench Press v2' }),
+    );
+    const updated = await service.update({
+      actorUserId: 'admin-1',
+      actorRole: Role.ADMIN,
+      exerciseId: 'ex-1',
+      name: 'Bench Press v2',
+      context,
+    });
+    expect(updated.name).toBe('Bench Press v2');
+  });
+
+  it('hides other users custom exercises', async () => {
+    exercises.findById.mockResolvedValue(
+      Exercise.create({
+        ...sample,
+        isCustom: true,
+        createdById: 'other',
+      }),
+    );
+    await expect(service.getById('ex-1', 'user-1')).rejects.toBeInstanceOf(
+      NotFoundError,
+    );
   });
 });

@@ -77,7 +77,9 @@ class EnvironmentVariables {
 /**
  * Validates process env at bootstrap. Fails fast on misconfiguration.
  */
-export function validateEnv(config: Record<string, unknown>): EnvironmentVariables {
+export function validateEnv(
+  config: Record<string, unknown>,
+): EnvironmentVariables {
   const validated = plainToInstance(EnvironmentVariables, config, {
     enableImplicitConversion: true,
   });

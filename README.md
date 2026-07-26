@@ -174,10 +174,27 @@ See `docs/phase-1/calendar-implementation.md`.
 
 See `docs/phase-1/notifications-implementation.md`.
 
+## Admin endpoints
+
+| Method | Path | Auth |
+|--------|------|------|
+| POST | `/admin/analytics/recompute` | Bearer + ADMIN |
+
+## Staging
+
+```bash
+cp .env.example .env.staging
+# set JWT_ACCESS_SECRET, GOOGLE_CLIENT_IDS, passwords
+npm run docker:staging
+```
+
+See `docs/ops/runbook.md` and `docs/phase-1/m5-m6-hardening.md`.
+
 ## Tests
 
 ```bash
 npm test
+npm run test:cov
 npm run test:e2e
 ```
 
@@ -185,9 +202,9 @@ npm run test:e2e
 
 Clean Architecture layout under `src/`:
 
-- `domain/identity` — entities, ports
-- `application/identity` — auth use cases
+- `domain` — entities, algorithms, ports
+- `application` — use cases
 - `infrastructure` — Prisma, JWT, Argon2id, Google, Redis, mail
-- `modules/auth` — HTTP controllers / DTOs / Swagger
+- `modules` — HTTP controllers / DTOs / Swagger
 
 See `docs/phase-1/08-authentication-flow.md` for the full design.

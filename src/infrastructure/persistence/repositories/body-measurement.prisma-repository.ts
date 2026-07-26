@@ -10,13 +10,14 @@ import {
   ListBodyMeasurementFilters,
   ListBodyMeasurementResult,
 } from '../../../domain/body-measurement/repositories/body-measurement.repository';
-import { NotFoundError, RepositoryError } from '../../../shared/errors/base.error';
+import {
+  NotFoundError,
+  RepositoryError,
+} from '../../../shared/errors/base.error';
 import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
-export class BodyMeasurementPrismaRepository
-  implements BodyMeasurementRepository
-{
+export class BodyMeasurementPrismaRepository implements BodyMeasurementRepository {
   constructor(private readonly prisma: PrismaService) {}
 
   async create(input: CreateBodyMeasurementInput): Promise<BodyMeasurement> {
@@ -76,7 +77,7 @@ export class BodyMeasurementPrismaRepository
     const page = hasMore ? rows.slice(0, filters.limit) : rows;
     return {
       items: page.map((row) => this.toDomain(row)),
-      nextCursor: hasMore ? page[page.length - 1]?.id ?? null : null,
+      nextCursor: hasMore ? (page[page.length - 1]?.id ?? null) : null,
     };
   }
 

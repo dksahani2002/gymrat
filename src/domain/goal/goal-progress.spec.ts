@@ -30,4 +30,16 @@ describe('computeProgressPercent', () => {
       computeProgressPercent({ baseline: 0, current: null, target: 100 }),
     ).toBeNull();
   });
+
+  it('handles zero target and equal baseline/target', () => {
+    expect(
+      computeProgressPercent({ baseline: null, current: 1, target: 0 }),
+    ).toBe(1);
+    expect(
+      computeProgressPercent({ baseline: 50, current: 50, target: 50 }),
+    ).toBe(1);
+    expect(
+      computeProgressPercent({ baseline: 50, current: 40, target: 50 }),
+    ).toBe(0.8);
+  });
 });

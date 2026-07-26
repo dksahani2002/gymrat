@@ -200,7 +200,11 @@ export class ProfileApplicationService {
     }
     const parsed = new Date(dateOfBirth);
     if (Number.isNaN(parsed.getTime())) {
-      throw new BusinessError('Invalid dateOfBirth', ErrorCodes.VALIDATION_ERROR, 400);
+      throw new BusinessError(
+        'Invalid dateOfBirth',
+        ErrorCodes.VALIDATION_ERROR,
+        400,
+      );
     }
     if (parsed.getTime() > Date.now()) {
       throw new BusinessError(
