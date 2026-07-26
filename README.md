@@ -72,6 +72,17 @@ Seed catalog: `npm run prisma:seed`
 | POST/PATCH/DELETE | `/workouts/:id/exercises...` | Bearer |
 | POST/PATCH/DELETE | `/workouts/:id/.../sets` | Bearer |
 
+## AI parser endpoints
+
+| Method | Path | Auth |
+|--------|------|------|
+| POST | `/ai/parse-text` | Bearer |
+| POST | `/ai/parse-voice` | Bearer (multipart `audio`) |
+| POST | `/ai/parse-image` | Bearer (501 stub) |
+| GET | `/ai/parse-logs` | Bearer |
+
+Drafts only — confirm via `POST /workouts`. See `docs/phase-1/ai-parser-implementation.md`.
+
 ## Tests
 
 ```bash

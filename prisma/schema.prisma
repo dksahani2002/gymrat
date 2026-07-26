@@ -97,6 +97,7 @@ model User {
   notificationPreferences NotificationPreference?
   auditLogs               AuditLog[]             @relation("AuditActor")
   workouts                Workout[]
+  aiParseLogs             AiParseLog[]
 
   @@map("users")
 }
@@ -367,4 +368,26 @@ model WorkoutIdempotencyKey {
   @@unique([userId, key])
   @@index([expiresAt])
   @@map("workout_idempotency_keys")
+}
+
+model AiParseLog {
+  id               String   @id @default(uuid()) @db.Uuid
+  userId           String   @map("user_id") @db.Uuid
+  modality         String
+  provider         String
+  model            String?
+  inputHash        String   @map("input_hash")
+  latencyMs        Int      @map("latency_ms")
+  promptTokens     Int?     @map("prompt_tokens")
+  completionTokens Int?     @map("completion_tokens")
+  confidence       Decimal? @db.Decimal(4, 3)
+  success          Boolean
+  errorCode        String?  @map("error_code")
+  resultSummary    Json?    @map("result_summary")
+  createdAt        DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt(sort: Desc)])
+  @@map("ai_parse_logs")
 }

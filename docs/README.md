@@ -23,6 +23,7 @@
 | 7 | [Sequence Diagrams](./phase-1/07-sequence-diagrams.md) | Key system interactions |
 | 8 | [Authentication Flow](./phase-1/08-authentication-flow.md) | JWT, refresh, Google OAuth |
 | 9 | [Workout Logging Flow](./phase-1/09-workout-logging-flow.md) | Text/voice → structured data |
+| — | [AI Parser Implementation](./phase-1/ai-parser-implementation.md) | Parse-text/voice ports, rules parser, logs |
 | 10 | [Analytics Engine](./phase-1/10-analytics-engine.md) | Volume, PRs, charts, jobs |
 | 11 | [Progressive Overload](./phase-1/11-progressive-overload.md) | Algorithm & recommendation rules |
 | 12 | [Project Roadmap](./phase-1/12-roadmap.md) | Phased delivery |
