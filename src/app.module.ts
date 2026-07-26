@@ -8,6 +8,7 @@ import { validateEnv } from './config/env.validation';
 import { RedisModule } from './infrastructure/cache/redis.module';
 import { PrismaModule } from './infrastructure/persistence/prisma/prisma.module';
 import { AuthModule } from './modules/auth/auth.module';
+import { AiModule } from './modules/ai/ai.module';
 import { ExercisesModule } from './modules/exercises/exercises.module';
 import { HealthModule } from './modules/health/health.module';
 import { UsersModule } from './modules/users/users.module';
@@ -41,6 +42,7 @@ import { RequestIdMiddleware } from './shared/middleware/request-id.middleware';
     UsersModule,
     ExercisesModule,
     WorkoutsModule,
+    AiModule,
     HealthModule,
   ],
   providers: [

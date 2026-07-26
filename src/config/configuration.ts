@@ -24,4 +24,11 @@ export default () => ({
     limit: parseInt(process.env.THROTTLE_LIMIT ?? '100', 10),
     authLimit: parseInt(process.env.AUTH_THROTTLE_LIMIT ?? '10', 10),
   },
+  ai: {
+    provider: process.env.AI_PARSER_PROVIDER ?? 'rules',
+    openaiApiKey: process.env.OPENAI_API_KEY ?? '',
+    openaiModel: process.env.OPENAI_MODEL ?? 'gpt-4o-mini',
+    voiceStorageDir: process.env.VOICE_STORAGE_DIR ?? './storage/voice',
+    maxVoiceBytes: parseInt(process.env.MAX_VOICE_BYTES ?? String(25 * 1024 * 1024), 10),
+  },
 });
